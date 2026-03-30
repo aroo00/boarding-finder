@@ -4,644 +4,2242 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>NSBM Student Finder</title>
+
+<!--
+  ============================================================
+  FONT
+  ============================================================
+-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+<!--
+  ============================================================
+  ICON SETUP — PNG ICON PACK
+  ------------------------------------------------------------
+  Place your PNG icon pack folder next to this HTML file.
+  Default assumed folder name: "icons/"
+
+  Expected icon filenames (all PNG):
+    icons/home.png          — boarding house
+    icons/bed.png           — room / rent
+    icons/food.png          — restaurant / food
+    icons/bus.png           — public bus
+    icons/train.png         — train / railway
+    icons/van.png           — private van service
+    icons/phone.png         — phone / call
+    icons/whatsapp.png      — whatsapp
+    icons/location.png      — open in google maps
+    icons/arrow-right.png   — detail arrow / navigate
+    icons/search.png        — search bar
+    icons/filter.png        — filter icon
+    icons/close.png         — close / dismiss
+    icons/plus.png          — add / register new listing
+    icons/clock.png         — bus schedule / time
+    icons/user.png          — owner / contact person
+    icons/star.png          — rating
+
+  TO CHANGE ICON FOLDER PATH:
+    Find the JS constant at the bottom: const ICON_PATH = "icons/";
+    Change "icons/" to your folder path, e.g. "assets/img/icons/"
+
+  TO CHANGE AN INDIVIDUAL ICON:
+    Each <img> tag has a data-icon attribute and a src built
+    from ICON_PATH + filename. Search for data-icon="home" etc.
+    to find and replace individual icons.
+  ============================================================
+-->
+
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#f5f4f0;--surface:#fff;--border:#e2e0da;--text:#1a1a1a;--muted:#6b6b6b;
-  --accent:#2d6a4f;--accent-h:#235c43;--accent-l:#e8f5ee;
-  --orange:#e76f51;--orange-l:#fef3ec;--indigo:#4338ca;--indigo-l:#eef2ff;
-  --amber:#b45309;--amber-l:#fef9ec;
-  --shadow:0 1px 4px rgba(0,0,0,.07);--shadow-md:0 4px 20px rgba(0,0,0,.1);--r:10px;
+/* ============================================================
+   CSS CUSTOM PROPERTIES
+   ============================================================ */
+:root {
+  --bg:        #f7f6f3;
+  --surface:   #ffffff;
+  --surface2:  #f0efe9;
+  --border:    #e4e2db;
+  --border2:   #d4d1c8;
+  --text:      #18181b;
+  --text2:     #52525b;
+  --text3:     #a1a1aa;
+  --accent:    #1c4f3a;
+  --accent-s:  #17422f;
+  --accent-l:  #eaf2ed;
+  --accent-m:  #b8d9c4;
+  --tag-food:  #7c3010;
+  --tag-food-l:#fdf0ea;
+  --tag-room:  #312e81;
+  --tag-room-l:#eeecfb;
+  --tag-bus:   #1e3a5f;
+  --tag-bus-l: #e8f0f9;
+  --tag-train: #4a1942;
+  --tag-train-l:#f5eef5;
+  --tag-van:   #3d2a00;
+  --tag-van-l: #fef6e4;
+  --radius:    10px;
+  --radius-lg: 16px;
+  --shadow:    0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.08);
 }
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
 
-/* HEADER */
-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 18px;display:flex;align-items:center;gap:12px;height:56px;position:sticky;top:0;z-index:200}
-.logo{background:var(--accent);color:#fff;font-family:'DM Serif Display',serif;font-size:12px;padding:4px 9px;border-radius:6px;flex-shrink:0}
-header h1{font-size:14px;font-weight:600;white-space:nowrap}
-header h1 small{font-weight:400;color:var(--muted);font-size:11px}
-.hright{margin-left:auto;display:flex;align-items:center;gap:8px}
-.pill{background:var(--accent-l);color:var(--accent);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500}
-.reg-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 13px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:background .15s}
-.reg-btn:hover{background:var(--accent-h)}
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: 'Instrument Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+img { display: block; }
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+a { color: inherit; text-decoration: none; }
 
-/* PAGES */
-.page{display:none;flex:1;min-height:0}
-.page.active{display:flex}
+/* ============================================================
+   ICON HELPER
+   All icons use <img class="icon" data-icon="name">
+   Size variants: .icon-sm (14px)  .icon-md (18px)  .icon-lg (24px)
+   ============================================================ */
+.icon { display: inline-block; object-fit: contain; flex-shrink: 0; }
+.icon-sm  { width: 14px; height: 14px; }
+.icon-md  { width: 18px; height: 18px; }
+.icon-lg  { width: 24px; height: 24px; }
+.icon-xl  { width: 32px; height: 32px; }
 
-/* SIDEBAR */
-.sidebar{width:360px;min-width:300px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
-.sidebar-top{padding:13px;border-bottom:1px solid var(--border)}
-.tabs{display:flex;gap:4px;margin-bottom:11px}
-.tb{flex:1;padding:7px 0;border:1px solid var(--border);background:var(--bg);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;text-align:center}
-.tb.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.tb:hover:not(.active){background:var(--accent-l);color:var(--accent);border-color:var(--accent)}
-.srow{display:flex;gap:7px;margin-bottom:10px}
-.sinput{flex:1;padding:8px 11px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--bg);outline:none;transition:border .15s}
-.sinput:focus{border-color:var(--accent)}
-.sbtn{padding:8px 12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer}
-.sbtn:hover{background:var(--accent-h)}
-.filters{display:flex;gap:6px;flex-wrap:wrap}
-.flabel{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;width:100%}
-select{flex:1;min-width:110px;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;background:var(--bg);color:var(--text);outline:none;cursor:pointer}
-select:focus{border-color:var(--accent)}
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
-.statusbar{padding:7px 13px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border);background:var(--bg)}
-.statusbar strong{color:var(--text)}
-.rlist{flex:1;overflow-y:auto;padding:9px;display:flex;flex-direction:column;gap:8px}
-.rlist::-webkit-scrollbar{width:4px}
-.rlist::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+/* ---- HEADER ---- */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 16px;
+  color: var(--accent);
+  letter-spacing: -.2px;
+  white-space: nowrap;
+}
+.header-logo span {
+  font-style: italic;
+  font-size: 12px;
+  color: var(--text3);
+  margin-left: 6px;
+  font-family: 'Instrument Sans', sans-serif;
+  font-weight: 400;
+}
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-register {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 12px;
+  font-weight: 500;
+  transition: background .15s;
+}
+.btn-register:hover { background: var(--accent-s); }
 
-/* CARD */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;cursor:pointer;transition:all .15s;position:relative}
-.card:hover{border-color:var(--accent);box-shadow:0 2px 12px rgba(45,106,79,.1)}
-.card.sel{border-color:var(--accent);background:var(--accent-l)}
-.card.owner{border-left:3px solid var(--orange)}
-.chd{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px}
-.cicon{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-.cb{background:var(--accent-l)}.cr{background:var(--indigo-l)}.cf{background:var(--orange-l)}
-.ctitle{font-size:13px;font-weight:600;line-height:1.3;padding-right:40px}
-.badge{display:inline-block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:2px 6px;border-radius:4px;margin-top:2px;margin-right:3px}
-.bb{background:var(--accent-l);color:var(--accent)}.br{background:var(--indigo-l);color:var(--indigo)}.bf{background:var(--orange-l);color:var(--orange)}.bo{background:var(--amber-l);color:var(--amber)}
-.crating{position:absolute;top:10px;right:10px;font-size:11px;font-weight:600;color:var(--amber)}
-.cmeta{display:flex;flex-wrap:wrap;gap:4px;font-size:11px;color:var(--muted)}
-.cnote{margin-top:5px;font-size:11px;color:var(--muted);line-height:1.5}
-.cprice{margin-top:6px;font-size:12px;font-weight:600;color:var(--accent)}
-.cactions{display:flex;gap:4px;margin-top:8px}
-.bts{flex:1;padding:6px 0;border-radius:6px;font-size:11px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text);transition:all .12s}
-.bts:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
-.bts.p{background:var(--accent);color:#fff;border-color:var(--accent)}
-.bts.p:hover{background:var(--accent-h)}
-.amenrow{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
-.atag{font-size:10px;padding:2px 6px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--muted)}
-.empty{text-align:center;padding:34px 16px;color:var(--muted);font-size:13px}
-.empty .ei{font-size:28px;margin-bottom:10px}
+/* ---- MAIN NAV ---- */
+.main-nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.main-nav::-webkit-scrollbar { display: none; }
+.nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text3);
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.nav-tab:hover { color: var(--text2); }
+.nav-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
 
-/* MAP */
-.mapc{flex:1;position:relative}
-#map{width:100%;height:100%;background:#e8e4dc}
-.movl{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 14px;font-size:11px;color:var(--muted);box-shadow:var(--shadow);white-space:nowrap;pointer-events:none}
-.movl strong{color:var(--text)}
-.spin{width:15px;height:15px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite}
-@keyframes sp{to{transform:rotate(360deg)}}
-.loading{display:flex;align-items:center;gap:8px;padding:20px;font-size:13px;color:var(--muted)}
+/* ---- PAGE CONTAINER ---- */
+.page { display: none; }
+.page.active { display: block; }
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 20px;
+}
 
+/* ============================================================
+   SECTION HEADER
+   ============================================================ */
+.section-hd {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  gap: 12px;
+}
+.section-hd h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 22px;
+  color: var(--text);
+  line-height: 1;
+}
+.section-hd p {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+.section-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
 
-/* ── REGISTER PAGE ── */
-.regpage{flex:1;overflow-y:auto;background:var(--bg);padding:28px 16px;flex-direction:column}
-.regwrap{max-width:660px;margin:0 auto;width:100%}
-.reghd{margin-bottom:24px}
-.reghd h2{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:5px}
-.reghd p{font-size:13px;color:var(--muted);line-height:1.6}
-.steps{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:24px}
-.stp{flex:1;padding:11px 6px;text-align:center;font-size:11px;font-weight:500;color:var(--muted);border-right:1px solid var(--border);transition:all .2s}
-.stp:last-child{border-right:none}
-.stp.active{background:var(--accent-l);color:var(--accent)}
-.stp.done{background:var(--accent);color:#fff}
-.stp-n{display:block;font-size:15px;margin-bottom:1px}
-.fc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px}
-.fc h3{font-size:13px;font-weight:600;margin-bottom:14px;padding-bottom:9px;border-bottom:1px solid var(--border)}
-.fg{display:grid;gap:12px}
-.fg2{grid-template-columns:1fr 1fr}
-.fgrp{display:flex;flex-direction:column;gap:4px}
-.fgrp label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
-.fgrp input,.fgrp select,.fgrp textarea{padding:8px 11px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--bg);color:var(--text);outline:none;transition:border .15s}
-.fgrp input:focus,.fgrp select:focus,.fgrp textarea:focus{border-color:var(--accent)}
-.fgrp textarea{resize:vertical;min-height:76px;line-height:1.5}
-.hint{font-size:10px;color:var(--muted)}
-.err{border-color:#e74c3c!important}
-.errmsg{font-size:10px;color:#e74c3c;margin-top:1px}
-.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.tc{border:2px solid var(--border);border-radius:9px;padding:14px 8px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg)}
-.tc:hover,.tc.sel{border-color:var(--accent);background:var(--accent-l)}
-.tc .ti{font-size:24px;margin-bottom:5px}
-.tc .tl{font-size:12px;font-weight:600}
-.tc .td{font-size:10px;color:var(--muted);margin-top:2px}
-.agrid{display:flex;flex-wrap:wrap;gap:6px}
-.achip{padding:5px 10px;border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;transition:all .15s;background:var(--bg);color:var(--muted)}
-.achip.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
-.popts{display:flex;gap:7px}
-.popt{flex:1;padding:8px;border:1px solid var(--border);border-radius:7px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg)}
-.popt:hover,.popt.sel{border-color:var(--accent);background:var(--accent-l)}
-.popt .pl{font-size:12px;font-weight:600}
-.popt .ps{font-size:10px;color:var(--muted);margin-top:1px}
-.upload{border:2px dashed var(--border);border-radius:9px;padding:24px;text-align:center;cursor:pointer;transition:border .15s;background:var(--bg)}
-.upload:hover{border-color:var(--accent)}
-.upload input{display:none}
-.prevs{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
-.prev{width:66px;height:66px;border-radius:7px;object-fit:cover;border:1px solid var(--border)}
-.fnav{display:flex;justify-content:space-between;align-items:center;margin-top:18px}
-.bout{padding:8px 16px;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
-.bout:hover{border-color:var(--accent);color:var(--accent)}
-.bpri{padding:8px 20px;border:none;border-radius:7px;background:var(--accent);color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s}
-.bpri:hover{background:var(--accent-h)}
-.succard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:36px;text-align:center}
-.succard .si{font-size:48px;margin-bottom:14px}
-.succard h3{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:7px}
-.succard p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:18px}
-.lprev{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:left;margin-bottom:18px}
-.lprev .ln{font-weight:600;font-size:14px;margin-bottom:4px}
-.lprev .lm{font-size:11px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px}
-.newbadge{display:inline-flex;align-items:center;gap:3px;background:var(--amber-l);color:var(--amber);font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px}
-@media(max-width:680px){
-  .page.active{flex-direction:column}
-  .sidebar{width:100%;height:50vh;min-width:unset}
-  .mapc{height:50vh}
-  .fg2{grid-template-columns:1fr}
-  .tgrid{grid-template-columns:1fr 1fr}
+/* ============================================================
+   SEARCH & FILTER BAR
+   ============================================================ */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.search-wrap {
+  flex: 1;
+  min-width: 180px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.search-wrap .icon {
+  position: absolute;
+  left: 11px;
+  opacity: .4;
+  pointer-events: none;
+}
+.search-input {
+  width: 100%;
+  padding: 9px 12px 9px 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  transition: border .15s;
+}
+.search-input:focus { border-color: var(--accent-m); }
+.filter-select {
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 12px;
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+  transition: border .15s;
+  min-width: 130px;
+}
+.filter-select:focus { border-color: var(--accent-m); }
+
+/* ============================================================
+   DASHBOARD GRID
+   ============================================================ */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+/* ============================================================
+   LISTING CARD  (Boarding / Room / Food)
+   ============================================================ */
+.listing-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: box-shadow .15s, border-color .15s;
+  position: relative;
+}
+.listing-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border2);
+}
+/* owner-registered cards get a subtle left accent */
+.listing-card.owner-card {
+  border-left: 3px solid var(--accent-m);
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+/* icon wrapper */
+.card-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  /*
+    TO REPLACE ICON BACKGROUND COLOUR PER TYPE:
+    Add .type-boarding .card-icon-wrap { background: #eaf2ed; } etc.
+  */
+}
+.card-title { font-size: 14px; font-weight: 600; line-height: 1.3; }
+.card-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+/* -- badge colour helpers -- */
+.badge-boarding { background: var(--accent-l);    color: var(--accent); }
+.badge-room     { background: var(--tag-room-l);   color: var(--tag-room); }
+.badge-food     { background: var(--tag-food-l);   color: var(--tag-food); }
+.badge-owner    { background: var(--tag-van-l);    color: var(--tag-van); }
+.badge-new      { background: #fff8e1;             color: #b45309; }
+
+/* rating pill */
+.rating-pill {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+}
+
+/* meta row */
+.card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text2);
+}
+
+/* amenity chips */
+.amenity-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.amenity-chip {
+  font-size: 11px;
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text3);
+  background: var(--bg);
+}
+
+/* price */
+.card-price {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* card action buttons */
+.card-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+}
+.btn-action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 0;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text2);
+  transition: all .13s;
+}
+.btn-action:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-action.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-action.primary:hover { background: var(--accent-s); }
+/* location button opens google maps */
+.btn-location { }
+
+/* ============================================================
+   TRANSPORT SECTION CARDS
+   ============================================================ */
+
+/* -- Bus schedule card -- */
+.transport-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow .15s;
+}
+.transport-card:hover { box-shadow: var(--shadow-md); }
+
+.transport-card-hd {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.transport-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.transport-title { font-size: 14px; font-weight: 600; }
+.transport-sub   { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.transport-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+/* bus timetable */
+.timetable {
+  width: 100%;
+  border-collapse: collapse;
+}
+.timetable th {
+  text-align: left;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: var(--text3);
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.timetable td {
+  padding: 9px 18px;
+  font-size: 12px;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.timetable tr:last-child td { border-bottom: none; }
+.timetable tr:hover td { background: var(--surface2); }
+.time-chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--tag-bus);
+  background: var(--tag-bus-l);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.time-chip.train { color: var(--tag-train); background: var(--tag-train-l); }
+.freq-chip {
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 7px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text3);
+}
+
+/* van service card */
+.van-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: box-shadow .15s;
+}
+.van-card:hover { box-shadow: var(--shadow-md); }
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 52px 20px;
+  color: var(--text3);
+}
+.empty-state p { font-size: 13px; margin-top: 10px; }
+
+/* ============================================================
+   REGISTER / OWNER MODAL  (slide-up panel)
+   ============================================================ */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.35);
+  z-index: 300;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-backdrop.open { display: flex; }
+
+.modal-panel {
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 700px;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 28px 24px 40px;
+  box-shadow: 0 -8px 40px rgba(0,0,0,.12);
+  animation: slideUp .22s ease;
+}
+@keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.modal-panel::-webkit-scrollbar { width: 4px; }
+.modal-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.modal-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.modal-hd h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 20px;
+}
+.btn-close {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-close:hover { background: var(--surface2); }
+
+/* step indicator inside modal */
+.modal-steps {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+.mstep {
+  flex: 1;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--border);
+  transition: background .2s;
+}
+.mstep.done, .mstep.active { background: var(--accent); }
+
+/* form layout */
+.form-section { margin-bottom: 20px; }
+.form-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: var(--text3);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.form-grid { display: grid; gap: 12px; }
+.form-grid-2 { grid-template-columns: 1fr 1fr; }
+
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  transition: border .15s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { border-color: var(--accent-m); }
+.form-group textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+.form-hint { font-size: 10px; color: var(--text3); }
+.input-error { border-color: #dc2626 !important; }
+.error-msg { font-size: 10px; color: #dc2626; margin-top: 2px; }
+
+/* type selector grid */
+.type-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.type-opt {
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s;
+  background: var(--bg);
+}
+.type-opt:hover, .type-opt.selected {
+  border-color: var(--accent);
+  background: var(--accent-l);
+}
+.type-opt-icon {
+  width: 28px; height: 28px;
+  margin: 0 auto 8px;
+}
+.type-opt-label { font-size: 12px; font-weight: 600; color: var(--text); }
+.type-opt-sub   { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+/* price selector */
+.price-selector { display: flex; gap: 8px; }
+.price-opt {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s;
+  background: var(--bg);
+}
+.price-opt:hover, .price-opt.selected {
+  border-color: var(--accent);
+  background: var(--accent-l);
+}
+.price-opt-label { font-size: 12px; font-weight: 600; }
+.price-opt-sub   { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+/* amenity chips selector */
+.amenity-selector { display: flex; flex-wrap: wrap; gap: 7px; }
+.amenity-opt {
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 11px;
+  cursor: pointer;
+  background: var(--bg);
+  color: var(--text2);
+  transition: all .13s;
+}
+.amenity-opt.selected {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* photo upload */
+.photo-upload-area {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .15s;
+  background: var(--bg);
+}
+.photo-upload-area:hover { border-color: var(--accent-m); }
+.photo-upload-area input { display: none; }
+.photo-upload-area p { font-size: 12px; color: var(--text3); margin-top: 8px; }
+.photo-previews { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.photo-preview {
+  width: 66px; height: 66px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+/* modal navigation */
+.modal-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.btn-back {
+  padding: 9px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  transition: all .13s;
+}
+.btn-back:hover { border-color: var(--accent); color: var(--accent); }
+.btn-next {
+  padding: 9px 22px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background .13s;
+}
+.btn-next:hover { background: var(--accent-s); }
+
+/* success state */
+.success-state {
+  text-align: center;
+  padding: 20px 0 10px;
+}
+.success-state .success-icon-wrap {
+  width: 56px; height: 56px;
+  background: var(--accent-l);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+.success-state h3 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+.success-state p { font-size: 13px; color: var(--text2); line-height: 1.7; }
+.listing-summary {
+  text-align: left;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin: 16px 0;
+}
+.listing-summary .ls-name { font-weight: 600; font-size: 14px; margin-bottom: 5px; }
+.listing-summary .ls-meta { font-size: 11px; color: var(--text3); display: flex; flex-wrap: wrap; gap: 10px; }
+.success-actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 600px) {
+  .container { padding: 20px 14px; }
+  .card-grid { grid-template-columns: 1fr; }
+  .form-grid-2 { grid-template-columns: 1fr; }
+  .type-selector { grid-template-columns: 1fr 1fr; }
+  .modal-panel { padding: 22px 16px 36px; }
+  .header { padding: 0 14px; }
+  .main-nav { padding: 0 14px; }
 }
 </style>
 </head>
 <body>
+<div class="app-shell">
 
-<header>
-  <div class="logo">NSBM</div>
-  <h1>Student Finder <small>— Pitipana, Homagama</small></h1>
-  <div class="hright">
-    <span class="pill">📍 20 km radius</span>
-    <button class="reg-btn" onclick="showPage('register')">➕ List Your Place</button>
-  </div>
-</header>
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+  <header class="header">
+    <div class="header-logo">
+      NSBM Student Finder
+      <span>Pitipana, Homagama</span>
+    </div>
+    <div class="header-right">
+      <button class="btn-register" onclick="openModal()">
+        <!--
+          ICON: plus.png — add / list a new place
+          Change src path if your folder differs
+        -->
+        <img class="icon icon-sm" src="icons/plus.png" alt="Add" data-icon="plus">
+        List Your Place
+      </button>
+    </div>
+  </header>
 
-<!-- ── SEARCH PAGE ── -->
-<div class="page active" id="page-search" style="flex-direction:row">
-  <div class="sidebar">
-    <div class="sidebar-top">
-      <div class="tabs">
-        <button class="tb active" onclick="switchTab('all',this)">🏠🍽 All</button>
-        <button class="tb" onclick="switchTab('boarding',this)">🏠 Board</button>
-        <button class="tb" onclick="switchTab('room',this)">🛏 Room</button>
-        <button class="tb" onclick="switchTab('food',this)">🍽 Food</button>
+  <!-- =====================================================
+       MAIN NAVIGATION TABS
+       ===================================================== -->
+  <nav class="main-nav">
+    <button class="nav-tab active" onclick="switchPage('boarding', this)">
+      <!--
+        ICON: home.png — boarding / rooms section
+      -->
+      <img class="icon icon-sm" src="icons/home.png" alt="" data-icon="home">
+      Boarding &amp; Rooms
+    </button>
+    <button class="nav-tab" onclick="switchPage('food', this)">
+      <!--
+        ICON: food.png — restaurants / food section
+      -->
+      <img class="icon icon-sm" src="icons/food.png" alt="" data-icon="food">
+      Food &amp; Restaurants
+    </button>
+    <button class="nav-tab" onclick="switchPage('bus', this)">
+      <!--
+        ICON: bus.png — public bus section
+      -->
+      <img class="icon icon-sm" src="icons/bus.png" alt="" data-icon="bus">
+      Public Bus
+    </button>
+    <button class="nav-tab" onclick="switchPage('train', this)">
+      <!--
+        ICON: train.png — train section
+      -->
+      <img class="icon icon-sm" src="icons/train.png" alt="" data-icon="train">
+      Train
+    </button>
+    <button class="nav-tab" onclick="switchPage('van', this)">
+      <!--
+        ICON: van.png — private van services section
+      -->
+      <img class="icon icon-sm" src="icons/van.png" alt="" data-icon="van">
+      Van Services
+    </button>
+  </nav>
+
+  <!-- =====================================================
+       PAGE: BOARDING & ROOMS
+       ===================================================== -->
+  <div class="page active" id="page-boarding">
+    <div class="container">
+      <div class="section-hd">
+        <div>
+          <h2>Boarding &amp; Rooms</h2>
+          <p>Places within 20 km of NSBM Green University</p>
+        </div>
+        <span class="section-count" id="boarding-count">— listings</span>
       </div>
-      <div class="srow">
-        <input class="sinput" id="searchInput" type="text" placeholder="Search name or area…"/>
-        <button class="sbtn" onclick="doSearch()">Search</button>
-      </div>
-      <div class="filters">
-        <span class="flabel">Filters</span>
-        <select id="priceF" onchange="applyFilters()">
-          <option value="">💰 Any price</option>
+
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <img class="icon icon-sm" src="icons/search.png" alt="Search" data-icon="search">
+          <input class="search-input" type="text" id="boarding-search"
+            placeholder="Search by name or area…"
+            oninput="renderBoarding()">
+        </div>
+        <select class="filter-select" id="boarding-type" onchange="renderBoarding()">
+          <option value="">All types</option>
+          <option value="boarding">Boarding house</option>
+          <option value="room">Room for rent</option>
+        </select>
+        <select class="filter-select" id="boarding-price" onchange="renderBoarding()">
+          <option value="">Any price</option>
           <option value="low">Budget</option>
           <option value="mid">Mid-range</option>
           <option value="high">Premium</option>
         </select>
-        <select id="distF" onchange="applyFilters()">
-          <option value="">📍 Any distance</option>
+        <select class="filter-select" id="boarding-dist" onchange="renderBoarding()">
+          <option value="">Any distance</option>
+          <option value="3">Within 3 km</option>
           <option value="5">Within 5 km</option>
           <option value="10">Within 10 km</option>
-          <option value="20">Within 20 km</option>
-        </select>
-        <select id="rateF" onchange="applyFilters()">
-          <option value="">⭐ Any rating</option>
-          <option value="4">4+ stars</option>
-          <option value="3">3+ stars</option>
         </select>
       </div>
-    </div>
-    <div class="statusbar" id="statusbar">Browse places near <strong>NSBM Green University</strong></div>
-    <div class="rlist" id="rlist">
-      <div class="empty"><div class="ei">🎓</div>Find boarding, rooms &amp; food<br>near <strong>NSBM Green University</strong></div>
+
+      <div class="card-grid" id="boarding-grid"></div>
     </div>
   </div>
 
-  <div class="mapc">
-    <div id="map"></div>
-    <div class="movl"><strong>NSBM Green University</strong> — Pitipana, Homagama</div>
-
-  </div>
-</div>
-
-<!-- ── REGISTER PAGE ── -->
-<div class="page" id="page-register">
-<div class="regpage">
-<div class="regwrap">
-  <div class="reghd">
-    <h2>List Your Place</h2>
-    <p>Register your boarding house, room, or restaurant so NSBM students can find you. Your listing goes live instantly.</p>
-  </div>
-
-  <div class="steps" id="stepInd">
-    <div class="stp active" id="si1"><span class="stp-n">1</span>Type</div>
-    <div class="stp" id="si2"><span class="stp-n">2</span>Details</div>
-    <div class="stp" id="si3"><span class="stp-n">3</span>Features</div>
-    <div class="stp" id="si4"><span class="stp-n">4</span>Contact</div>
-    <div class="stp" id="si5"><span class="stp-n">✓</span>Done</div>
-  </div>
-
-  <!-- Step 1 -->
-  <div id="rs1">
-    <div class="fc">
-      <h3>🏷 What are you listing?</h3>
-      <div class="tgrid">
-        <div class="tc" onclick="pickType('boarding',this)"><div class="ti">🏠</div><div class="tl">Boarding House</div><div class="td">Full boarding with meals</div></div>
-        <div class="tc" onclick="pickType('room',this)"><div class="ti">🛏</div><div class="tl">Room for Rent</div><div class="td">Single or shared room</div></div>
-        <div class="tc" onclick="pickType('food',this)"><div class="ti">🍽</div><div class="tl">Restaurant / Food</div><div class="td">Restaurant, cafe or food shop</div></div>
-      </div>
-      <p id="typeErr" class="errmsg" style="margin-top:8px"></p>
-    </div>
-    <div class="fnav">
-      <button class="bout" onclick="showPage('search')">← Back to Search</button>
-      <button class="bpri" onclick="nextS(1)">Continue →</button>
-    </div>
-  </div>
-
-  <!-- Step 2 -->
-  <div id="rs2" style="display:none">
-    <div class="fc">
-      <h3>📋 Place Details</h3>
-      <div class="fg">
-        <div class="fgrp"><label>Place Name *</label><input type="text" id="fn" placeholder="e.g. Saman's Boarding House"/></div>
-        <div class="fg fg2">
-          <div class="fgrp"><label>Address / Area *</label><input type="text" id="fa" placeholder="e.g. Pitipana Rd, Homagama"/></div>
-          <div class="fgrp"><label>Distance from NSBM (km) *</label><input type="number" id="fd" min="0.1" max="20" step="0.1" placeholder="e.g. 1.5"/><span class="hint">Must be within 20 km</span></div>
+  <!-- =====================================================
+       PAGE: FOOD & RESTAURANTS
+       ===================================================== -->
+  <div class="page" id="page-food">
+    <div class="container">
+      <div class="section-hd">
+        <div>
+          <h2>Food &amp; Restaurants</h2>
+          <p>Restaurants, cafes and food shops near NSBM</p>
         </div>
-        <div class="fgrp" id="rentRow" style="display:none"><label>Monthly Rent (Rs.) *</label><input type="number" id="frent" placeholder="e.g. 8000"/></div>
-        <div class="fgrp" id="mealRow" style="display:none"><label>Average Meal Price (Rs.)</label><input type="number" id="fmeal" placeholder="e.g. 350"/></div>
-        <div class="fgrp">
-          <label>Price Range *</label>
-          <div class="popts">
-            <div class="popt" onclick="pickPrice('low',this)"><div class="pl">Budget</div><div class="ps">Affordable</div></div>
-            <div class="popt" onclick="pickPrice('mid',this)"><div class="pl">Mid-range</div><div class="ps">Moderate</div></div>
-            <div class="popt" onclick="pickPrice('high',this)"><div class="pl">Premium</div><div class="ps">High-end</div></div>
+        <span class="section-count" id="food-count">— listings</span>
+      </div>
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <img class="icon icon-sm" src="icons/search.png" alt="Search" data-icon="search">
+          <input class="search-input" type="text" id="food-search"
+            placeholder="Search by name or area…"
+            oninput="renderFood()">
+        </div>
+        <select class="filter-select" id="food-price" onchange="renderFood()">
+          <option value="">Any price</option>
+          <option value="low">Budget</option>
+          <option value="mid">Mid-range</option>
+          <option value="high">Premium</option>
+        </select>
+        <select class="filter-select" id="food-dist" onchange="renderFood()">
+          <option value="">Any distance</option>
+          <option value="3">Within 3 km</option>
+          <option value="5">Within 5 km</option>
+          <option value="10">Within 10 km</option>
+        </select>
+      </div>
+      <div class="card-grid" id="food-grid"></div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       PAGE: PUBLIC BUS
+       ===================================================== -->
+  <div class="page" id="page-bus">
+    <div class="container">
+      <div class="section-hd">
+        <div>
+          <h2>Public Bus Routes</h2>
+          <p>CTB &amp; private bus routes serving NSBM &amp; Homagama</p>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <img class="icon icon-sm" src="icons/search.png" alt="Search" data-icon="search">
+          <input class="search-input" type="text" id="bus-search"
+            placeholder="Search route or destination…"
+            oninput="renderBus()">
+        </div>
+      </div>
+      <div class="card-grid" id="bus-grid"></div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       PAGE: TRAIN
+       ===================================================== -->
+  <div class="page" id="page-train">
+    <div class="container">
+      <div class="section-hd">
+        <div>
+          <h2>Train Schedule</h2>
+          <p>Nearest station: Homagama — Kelani Valley Line</p>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <img class="icon icon-sm" src="icons/search.png" alt="Search" data-icon="search">
+          <input class="search-input" type="text" id="train-search"
+            placeholder="Search destination or train…"
+            oninput="renderTrain()">
+        </div>
+      </div>
+      <div class="card-grid" id="train-grid"></div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       PAGE: VAN SERVICES
+       ===================================================== -->
+  <div class="page" id="page-van">
+    <div class="container">
+      <div class="section-hd">
+        <div>
+          <h2>Private Van Services</h2>
+          <p>Daily transport services to &amp; from NSBM</p>
+        </div>
+        <span class="section-count" id="van-count">— services</span>
+      </div>
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <img class="icon icon-sm" src="icons/search.png" alt="Search" data-icon="search">
+          <input class="search-input" type="text" id="van-search"
+            placeholder="Search area or service name…"
+            oninput="renderVan()">
+        </div>
+      </div>
+      <div class="card-grid" id="van-grid"></div>
+    </div>
+  </div>
+
+</div><!-- end app-shell -->
+
+
+<!-- =====================================================
+     REGISTER MODAL (owner listing)
+     ===================================================== -->
+<div class="modal-backdrop" id="modal" onclick="backdropClick(event)">
+  <div class="modal-panel">
+
+    <div class="modal-hd">
+      <h2>List Your Place</h2>
+      <button class="btn-close" onclick="closeModal()" aria-label="Close">
+        <!--
+          ICON: close.png — dismiss modal
+        -->
+        <img class="icon icon-sm" src="icons/close.png" alt="Close" data-icon="close">
+      </button>
+    </div>
+
+    <!-- step progress bar: 4 steps -->
+    <div class="modal-steps">
+      <div class="mstep active" id="ms1"></div>
+      <div class="mstep" id="ms2"></div>
+      <div class="mstep" id="ms3"></div>
+      <div class="mstep" id="ms4"></div>
+    </div>
+
+    <!-- STEP 1: Type selection -->
+    <div id="modal-step-1">
+      <div class="form-section">
+        <div class="form-section-title">What are you listing?</div>
+        <div class="type-selector">
+          <div class="type-opt" onclick="selectType('boarding', this)">
+            <!--
+              ICON: home.png — boarding house option
+            -->
+            <img class="type-opt-icon" src="icons/home.png" alt="Boarding" data-icon="home">
+            <div class="type-opt-label">Boarding House</div>
+            <div class="type-opt-sub">Full board with meals</div>
           </div>
-          <p id="priceErr" class="errmsg"></p>
+          <div class="type-opt" onclick="selectType('room', this)">
+            <!--
+              ICON: bed.png — room for rent option
+            -->
+            <img class="type-opt-icon" src="icons/bed.png" alt="Room" data-icon="bed">
+            <div class="type-opt-label">Room for Rent</div>
+            <div class="type-opt-sub">Single or shared</div>
+          </div>
+          <div class="type-opt" onclick="selectType('food', this)">
+            <!--
+              ICON: food.png — restaurant option
+            -->
+            <img class="type-opt-icon" src="icons/food.png" alt="Food" data-icon="food">
+            <div class="type-opt-label">Restaurant / Food</div>
+            <div class="type-opt-sub">Restaurant or cafe</div>
+          </div>
         </div>
-        <div class="fgrp"><label>Description</label><textarea id="fdesc" placeholder="Describe your place — room types, food menu, special features…"></textarea></div>
-        <div class="fgrp"><label>Google Maps Link (optional)</label><input type="url" id="fmap" placeholder="https://maps.google.com/…"/><span class="hint">Paste your Google Maps share link for exact pin</span></div>
+        <p class="error-msg" id="type-err" style="margin-top:8px"></p>
+      </div>
+      <div class="modal-nav">
+        <button class="btn-back" onclick="closeModal()">Cancel</button>
+        <button class="btn-next" onclick="nextStep(1)">Continue</button>
       </div>
     </div>
-    <div class="fnav">
-      <button class="bout" onclick="prevS(2)">← Back</button>
-      <button class="bpri" onclick="nextS(2)">Continue →</button>
-    </div>
-  </div>
 
-  <!-- Step 3 -->
-  <div id="rs3" style="display:none">
-    <div class="fc" id="fcBoarding" style="display:none">
-      <h3>🛏 Boarding &amp; Room Features</h3>
-      <div class="agrid" id="agBoarding"></div>
-    </div>
-    <div class="fc" id="fcFood" style="display:none">
-      <h3>🍽 Food &amp; Restaurant Features</h3>
-      <div class="agrid" id="agFood"></div>
-    </div>
-    <div class="fc">
-      <h3>🕐 Availability &amp; Hours</h3>
-      <div class="fg fg2">
-        <div class="fgrp" id="grRooms" style="display:none"><label>Rooms Available</label><input type="number" id="frooms" min="0" placeholder="e.g. 3"/></div>
-        <div class="fgrp" id="grGender" style="display:none"><label>Suitable For</label><select id="fgender"><option value="any">Any student</option><option value="male">Male students</option><option value="female">Female students</option></select></div>
-        <div class="fgrp" id="grHours" style="display:none"><label>Opening Hours</label><input type="text" id="fhours" placeholder="e.g. 6:00 AM – 9:00 PM"/></div>
-        <div class="fgrp" id="grDays" style="display:none"><label>Open Days</label><select id="fdays"><option value="everyday">Every day</option><option value="weekdays">Weekdays only</option><option value="mon-sat">Mon – Sat</option></select></div>
-      </div>
-    </div>
-    <div class="fc">
-      <h3>📸 Photos <small style="font-weight:400;color:var(--muted)">(optional)</small></h3>
-      <div class="upload" onclick="document.getElementById('fphoto').click()">
-        <input type="file" id="fphoto" accept="image/*" multiple onchange="handlePics(event)"/>
-        <div style="font-size:26px;margin-bottom:7px">📷</div>
-        <p style="font-size:12px;color:var(--muted)">Click to upload photos<br><span style="font-size:10px">JPG, PNG — up to 5 MB each</span></p>
-      </div>
-      <div class="prevs" id="prevs"></div>
-    </div>
-    <div class="fnav">
-      <button class="bout" onclick="prevS(3)">← Back</button>
-      <button class="bpri" onclick="nextS(3)">Continue →</button>
-    </div>
-  </div>
-
-  <!-- Step 4 -->
-  <div id="rs4" style="display:none">
-    <div class="fc">
-      <h3>👤 Owner &amp; Contact Info</h3>
-      <div class="fg">
-        <div class="fg fg2">
-          <div class="fgrp"><label>Your Full Name *</label><input type="text" id="fowner" placeholder="Your name"/></div>
-          <div class="fgrp"><label>Phone Number *</label><input type="tel" id="fphone" placeholder="+94 7X XXX XXXX"/></div>
+    <!-- STEP 2: Place details -->
+    <div id="modal-step-2" style="display:none">
+      <div class="form-section">
+        <div class="form-section-title">Place Details</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Place Name *</label>
+            <input type="text" id="f-name" placeholder="e.g. Saman's Boarding House">
+          </div>
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label>Address / Area *</label>
+              <input type="text" id="f-address" placeholder="e.g. Pitipana Rd, Homagama">
+            </div>
+            <div class="form-group">
+              <label>Distance from NSBM (km) *</label>
+              <input type="number" id="f-dist" min="0.1" max="20" step="0.1" placeholder="e.g. 1.5">
+              <span class="form-hint">Must be within 20 km</span>
+            </div>
+          </div>
+          <!-- shown for boarding/room -->
+          <div class="form-group" id="f-rent-row" style="display:none">
+            <label>Monthly Rent (Rs.) *</label>
+            <input type="number" id="f-rent" placeholder="e.g. 8000">
+          </div>
+          <!-- shown for food -->
+          <div class="form-group" id="f-meal-row" style="display:none">
+            <label>Average Meal Price (Rs.)</label>
+            <input type="number" id="f-meal" placeholder="e.g. 350">
+          </div>
+          <div class="form-group">
+            <label>Price Range *</label>
+            <div class="price-selector">
+              <div class="price-opt" onclick="selectPrice('low', this)">
+                <div class="price-opt-label">Budget</div>
+                <div class="price-opt-sub">Affordable</div>
+              </div>
+              <div class="price-opt" onclick="selectPrice('mid', this)">
+                <div class="price-opt-label">Mid-range</div>
+                <div class="price-opt-sub">Moderate</div>
+              </div>
+              <div class="price-opt" onclick="selectPrice('high', this)">
+                <div class="price-opt-label">Premium</div>
+                <div class="price-opt-sub">High-end</div>
+              </div>
+            </div>
+            <p class="error-msg" id="price-err"></p>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="f-desc" placeholder="Describe your place — rooms, facilities, food menu…"></textarea>
+          </div>
+          <!--
+            LOCATION FIELD:
+            Owner pastes a Google Maps share link or coordinates.
+            When a student clicks "Location" on the card, it opens
+            this URL directly in Google Maps.
+          -->
+          <div class="form-group">
+            <label>Google Maps Location Link</label>
+            <input type="url" id="f-location"
+              placeholder="https://maps.google.com/?q=6.8213,80.0419">
+            <span class="form-hint">
+              Paste your Google Maps share link — students will be taken directly to your location.
+            </span>
+          </div>
+          <!-- for boarding/room: gender preference -->
+          <div class="form-group" id="f-gender-row" style="display:none">
+            <label>Suitable For</label>
+            <select id="f-gender">
+              <option value="any">Any student</option>
+              <option value="male">Male students only</option>
+              <option value="female">Female students only</option>
+            </select>
+          </div>
         </div>
-        <div class="fg fg2">
-          <div class="fgrp"><label>WhatsApp Number</label><input type="tel" id="fwa" placeholder="+94 7X XXX XXXX"/></div>
-          <div class="fgrp"><label>Email Address</label><input type="email" id="femail" placeholder="your@email.com"/></div>
+      </div>
+      <div class="modal-nav">
+        <button class="btn-back" onclick="prevStep(2)">Back</button>
+        <button class="btn-next" onclick="nextStep(2)">Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Amenities & photos -->
+    <div id="modal-step-3" style="display:none">
+      <div class="form-section" id="f-amenities-section">
+        <div class="form-section-title">Features &amp; Amenities</div>
+        <div class="amenity-selector" id="amenity-selector"></div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">Photos <span style="font-weight:400;color:var(--text3)">(optional)</span></div>
+        <!--
+          ICON: plus.png used inside upload area
+        -->
+        <div class="photo-upload-area" onclick="document.getElementById('f-photos').click()">
+          <input type="file" id="f-photos" accept="image/*" multiple onchange="handlePhotos(event)">
+          <img class="icon icon-lg" src="icons/plus.png" alt="Upload" data-icon="plus"
+            style="margin:0 auto;opacity:.3">
+          <p>Click to upload photos of your place<br>
+            <span style="font-size:10px">JPG or PNG, max 5 MB each</span>
+          </p>
         </div>
-        <div class="fgrp"><label>Facebook Page (optional)</label><input type="url" id="ffb" placeholder="https://facebook.com/…"/></div>
+        <div class="photo-previews" id="photo-previews"></div>
+      </div>
+      <div class="modal-nav">
+        <button class="btn-back" onclick="prevStep(3)">Back</button>
+        <button class="btn-next" onclick="nextStep(3)">Continue</button>
       </div>
     </div>
-    <div class="fc" style="font-size:12px;color:var(--muted);line-height:1.8">
-      <h3>✅ Terms of Listing</h3>
-      By submitting you confirm that all information is accurate, your place is within 20 km of NSBM, and students may contact you via the details provided.
-    </div>
-    <div class="fnav">
-      <button class="bout" onclick="prevS(4)">← Back</button>
-      <button class="bpri" onclick="submit()">✓ Publish Listing</button>
-    </div>
-  </div>
 
-  <!-- Step 5 -->
-  <div id="rs5" style="display:none">
-    <div class="succard">
-      <div class="si">🎉</div>
-      <h3>Listing Published!</h3>
-      <p>Your place is now visible to all NSBM students on the finder map. They can call, WhatsApp, or get directions directly from your listing.</p>
-      <div class="lprev" id="lprev"></div>
-      <div style="display:flex;gap:10px;justify-content:center">
-        <button class="bpri" onclick="viewOnMap()">View on Map</button>
-        <button class="bout" onclick="addAnother()">Add Another Place</button>
+    <!-- STEP 4: Contact -->
+    <div id="modal-step-4" style="display:none">
+      <div class="form-section">
+        <div class="form-section-title">Owner Contact Info</div>
+        <div class="form-grid">
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label>Your Full Name *</label>
+              <input type="text" id="f-owner" placeholder="Your name">
+            </div>
+            <div class="form-group">
+              <label>Phone Number *</label>
+              <input type="tel" id="f-phone" placeholder="+94 7X XXX XXXX">
+            </div>
+          </div>
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label>WhatsApp Number</label>
+              <input type="tel" id="f-whatsapp" placeholder="+94 7X XXX XXXX">
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="f-email" placeholder="you@email.com">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-section" style="font-size:12px;color:var(--text3);line-height:1.8">
+        <div class="form-section-title">Confirmation</div>
+        By submitting you confirm that all details are accurate, your place is within 20 km of NSBM Green University, and students may contact you via the information provided.
+      </div>
+      <div class="modal-nav">
+        <button class="btn-back" onclick="prevStep(4)">Back</button>
+        <button class="btn-next" onclick="submitListing()">Publish Listing</button>
       </div>
     </div>
-  </div>
 
-</div>
-</div>
-</div>
+    <!-- STEP 5: Success -->
+    <div id="modal-step-5" style="display:none">
+      <div class="success-state">
+        <div class="success-icon-wrap">
+          <!--
+            ICON: star.png or a checkmark icon for success state
+            Replace star.png with your preferred success/check icon
+          -->
+          <img class="icon icon-lg" src="icons/star.png" alt="Success" data-icon="star">
+        </div>
+        <h3>Listing Published</h3>
+        <p>Your place is now visible to NSBM students.<br>They can call, WhatsApp or get directions directly.</p>
+        <div class="listing-summary" id="listing-summary"></div>
+        <div class="success-actions">
+          <button class="btn-next" onclick="closeModal()">Done</button>
+          <button class="btn-back" onclick="addAnother()">Add Another</button>
+        </div>
+      </div>
+    </div>
 
+  </div><!-- end modal-panel -->
+</div><!-- end modal-backdrop -->
+
+
+<!-- =====================================================
+     JAVASCRIPT
+     ===================================================== -->
 <script>
-const NSBM={lat:6.8213,lng:80.0419};
-let map,service,markers=[],iw,curTab='all',allR=[],ownerR=[];
-let rType='',rPrice='',rAmen=[],curStep=1;
+/* ============================================================
+   ICON PATH CONFIGURATION
+   ------------------------------------------------------------
+   Change this to match the folder where you put your PNG icons.
+   Examples:
+     "icons/"            — folder named "icons" next to index.html
+     "assets/img/icons/" — inside assets folder
+     "img/"              — flat img folder
+   ============================================================ */
+const ICON_PATH = "icons/";
 
-const BA=['🔌 WiFi','🍳 Meals included','🌡 Hot water','❄ AC','🔒 Security 24h','🧺 Laundry','🛋 Furnished','🚗 Parking','📺 TV','⚡ Backup power','🪴 Garden','🐾 Pet friendly'];
-const FA=['🪑 Dine-in','🅿 Takeaway','🛵 Delivery','☕ Beverages','🍚 Rice & Curry','🥪 Short Eats','🌿 Vegetarian','🧃 Juices','💳 Card accepted','🔌 WiFi','📦 Bulk orders','🎂 Catering'];
+/* ============================================================
+   AUTO-FIX ALL ICON SRC PATHS ON LOAD
+   This sets all <img data-icon="x"> src to ICON_PATH + x + ".png"
+   so you only need to change ICON_PATH above.
+   ============================================================ */
+document.querySelectorAll('img[data-icon]').forEach(img => {
+  img.src = ICON_PATH + img.getAttribute('data-icon') + '.png';
+});
 
-const DEMO=[
-  {id:1,name:"Saman's Boarding House",type:"boarding",rating:4.3,distance:1.2,price:"low",priceLabel:"Rs.4,500/mo",address:"Pitipana Rd, Homagama",lat:6.8290,lng:80.0380,phone:"+94 71 234 5678",note:"3 rooms available, meals optional",amenities:["🔌 WiFi","🍳 Meals included"]},
-  {id:2,name:"Green Hostel Homagama",type:"boarding",rating:4.5,distance:2.1,price:"mid",priceLabel:"Rs.8,000/mo",address:"Homagama Town",lat:6.8480,lng:80.0240,phone:"+94 77 345 6789",note:"AC rooms, WiFi, 24h security",amenities:["❄ AC","🔌 WiFi","🔒 Security 24h"]},
-  {id:3,name:"Nilufar Rooms",type:"room",rating:3.9,distance:3.5,price:"low",priceLabel:"Rs.3,500/mo",address:"Polgasowita, Homagama",lat:6.8100,lng:80.0560,phone:"+94 76 456 7890",note:"Single/double rooms, shared kitchen",amenities:["🛋 Furnished"]},
-  {id:4,name:"University View Lodge",type:"boarding",rating:4.7,distance:0.8,price:"mid",priceLabel:"Rs.12,000/mo",address:"Pitipana, Homagama",lat:6.8260,lng:80.0340,phone:"+94 70 567 8901",note:"Closest to NSBM, fully furnished",amenities:["🔌 WiFi","🛋 Furnished","🔒 Security 24h","🌡 Hot water"]},
-  {id:5,name:"Sunrise Boarding",type:"boarding",rating:4.1,distance:4.2,price:"mid",priceLabel:"Rs.7,500/mo",address:"Hanwella Rd, Homagama",lat:6.8380,lng:80.0700,phone:"+94 71 678 9012",note:"Hot water, laundry, quiet area",amenities:["🌡 Hot water","🧺 Laundry"]},
-  {id:6,name:"Studio Room — Pannipitiya",type:"room",rating:4.0,distance:8.5,price:"mid",priceLabel:"Rs.9,000/mo",address:"Pannipitiya, Colombo",lat:6.8570,lng:79.9680,phone:"+94 71 890 5678",note:"10 min bus to NSBM",amenities:["🔌 WiFi","🛋 Furnished"]},
-  {id:7,name:"Rice & Curry Palace",type:"food",rating:4.4,distance:0.9,price:"low",priceLabel:"~Rs.200–350/meal",address:"Pitipana Rd, Homagama",lat:6.8235,lng:80.0470,phone:"+94 71 234 0001",note:"Open 6am–9pm, Sri Lankan meals",amenities:["🅿 Takeaway","🪑 Dine-in","🍚 Rice & Curry"]},
-  {id:8,name:"NSBM Campus Canteen",type:"food",rating:4.0,distance:0.1,price:"low",priceLabel:"~Rs.150–300/meal",address:"NSBM Green University",lat:6.8215,lng:80.0425,phone:"",note:"On-campus meals for students",amenities:["🪑 Dine-in","🍚 Rice & Curry","🥪 Short Eats"]},
-  {id:9,name:"The Foodie Hub",type:"food",rating:4.6,distance:1.5,price:"mid",priceLabel:"~Rs.400–700/meal",address:"Homagama Main St",lat:6.8450,lng:80.0310,phone:"+94 72 345 0002",note:"Burgers, kottu, pasta",amenities:["🅿 Takeaway","🛵 Delivery","💳 Card accepted","🔌 WiFi"]},
-  {id:10,name:"Malsha's Kitchen",type:"food",rating:4.2,distance:2.0,price:"low",priceLabel:"~Rs.180–280/meal",address:"Polgasowita",lat:6.8150,lng:80.0600,phone:"+94 76 456 0003",note:"Home-cooked meals, delivery",amenities:["🛵 Delivery","🌿 Vegetarian","🍚 Rice & Curry"]},
-  {id:11,name:"Campus Deli",type:"food",rating:4.1,distance:0.5,price:"low",priceLabel:"~Rs.250–500/meal",address:"Pitipana, Homagama",lat:6.8240,lng:80.0390,phone:"+94 77 789 0006",note:"Sandwiches, snacks, coffee",amenities:["☕ Beverages","🥪 Short Eats","🅿 Takeaway"]},
+
+/* ============================================================
+   DATA — BOARDING & ROOMS
+   Add, remove or edit entries here.
+   Fields:
+     id        — unique string
+     type      — "boarding" | "room"
+     name      — display name
+     address   — address text
+     distance  — km from NSBM (number)
+     price     — "low" | "mid" | "high"
+     priceLabel— display string e.g. "Rs.8,000/mo"
+     rating    — number 0–5 (0 = new, unrated)
+     phone     — phone string or ""
+     whatsapp  — whatsapp number string or ""
+     gender    — "any" | "male" | "female"
+     note      — short description
+     amenities — array of strings
+     location  — Google Maps URL (student taps to open maps)
+                 Format: "https://maps.google.com/?q=LAT,LNG"
+                 or a google maps share link.
+                 Leave "" if not available.
+     isOwner   — true if added via register form
+   ============================================================ */
+const boardingData = [
+  {
+    id: "b1", type: "boarding",
+    name: "Saman's Boarding House",
+    address: "Pitipana Rd, Homagama",
+    distance: 1.2, price: "low", priceLabel: "Rs.4,500/mo",
+    rating: 4.3, phone: "+94 71 234 5678", whatsapp: "+94712345678",
+    gender: "any", note: "3 rooms available. Meals optional. Quiet area.",
+    amenities: ["WiFi", "Meals", "Hot water"],
+    location: "https://maps.google.com/?q=6.8290,80.0380",
+    isOwner: false
+  },
+  {
+    id: "b2", type: "boarding",
+    name: "Green Hostel Homagama",
+    address: "Homagama Town, Colombo",
+    distance: 2.1, price: "mid", priceLabel: "Rs.8,000/mo",
+    rating: 4.5, phone: "+94 77 345 6789", whatsapp: "+94773456789",
+    gender: "any", note: "AC rooms, WiFi included, 24h security.",
+    amenities: ["AC", "WiFi", "Security 24h", "Laundry"],
+    location: "https://maps.google.com/?q=6.8480,80.0240",
+    isOwner: false
+  },
+  {
+    id: "b3", type: "room",
+    name: "Nilufar Rooms",
+    address: "Polgasowita, Homagama",
+    distance: 3.5, price: "low", priceLabel: "Rs.3,500/mo",
+    rating: 3.9, phone: "+94 76 456 7890", whatsapp: "",
+    gender: "female", note: "Single and double rooms. Shared kitchen available.",
+    amenities: ["Furnished", "Kitchen"],
+    location: "https://maps.google.com/?q=6.8100,80.0560",
+    isOwner: false
+  },
+  {
+    id: "b4", type: "boarding",
+    name: "University View Lodge",
+    address: "Pitipana, Homagama",
+    distance: 0.8, price: "mid", priceLabel: "Rs.12,000/mo",
+    rating: 4.7, phone: "+94 70 567 8901", whatsapp: "+94705678901",
+    gender: "any", note: "Closest to NSBM campus. Fully furnished rooms.",
+    amenities: ["WiFi", "Furnished", "Security 24h", "Hot water", "Parking"],
+    location: "https://maps.google.com/?q=6.8260,80.0340",
+    isOwner: false
+  },
+  {
+    id: "b5", type: "room",
+    name: "Studio Room — Pannipitiya",
+    address: "Pannipitiya, Colombo",
+    distance: 8.5, price: "mid", priceLabel: "Rs.9,000/mo",
+    rating: 4.0, phone: "+94 71 890 5678", whatsapp: "",
+    gender: "any", note: "Clean studio rooms. 10 min bus ride to NSBM.",
+    amenities: ["WiFi", "Furnished"],
+    location: "https://maps.google.com/?q=6.8570,79.9680",
+    isOwner: false
+  },
 ];
 
-function showPage(p){
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-  document.getElementById('page-'+p).classList.add('active');
-  if(p==='search') applyFilters();
+/* ============================================================
+   DATA — FOOD & RESTAURANTS
+   Same field structure as boarding. priceLabel shows meal cost.
+   ============================================================ */
+const foodData = [
+  {
+    id: "f1", type: "food",
+    name: "Rice & Curry Palace",
+    address: "Pitipana Rd, Homagama",
+    distance: 0.9, price: "low", priceLabel: "~Rs.200–350/meal",
+    rating: 4.4, phone: "+94 71 234 0001", whatsapp: "",
+    note: "Sri Lankan meals. Open 6:00 AM – 9:00 PM daily.",
+    amenities: ["Takeaway", "Dine-in", "Rice & Curry"],
+    location: "https://maps.google.com/?q=6.8235,80.0470",
+    isOwner: false
+  },
+  {
+    id: "f2", type: "food",
+    name: "NSBM Campus Canteen",
+    address: "NSBM Green University",
+    distance: 0.1, price: "low", priceLabel: "~Rs.150–300/meal",
+    rating: 4.0, phone: "", whatsapp: "",
+    note: "On-campus canteen. Daily meals for students.",
+    amenities: ["Dine-in", "Rice & Curry", "Short Eats"],
+    location: "https://maps.google.com/?q=6.8215,80.0425",
+    isOwner: false
+  },
+  {
+    id: "f3", type: "food",
+    name: "The Foodie Hub",
+    address: "Homagama Main St",
+    distance: 1.5, price: "mid", priceLabel: "~Rs.400–700/meal",
+    rating: 4.6, phone: "+94 72 345 0002", whatsapp: "+94723450002",
+    note: "Burgers, kottu, pasta. Delivery available.",
+    amenities: ["Takeaway", "Delivery", "Card payment", "WiFi"],
+    location: "https://maps.google.com/?q=6.8450,80.0310",
+    isOwner: false
+  },
+  {
+    id: "f4", type: "food",
+    name: "Malsha's Kitchen",
+    address: "Polgasowita",
+    distance: 2.0, price: "low", priceLabel: "~Rs.180–280/meal",
+    rating: 4.2, phone: "+94 76 456 0003", whatsapp: "",
+    note: "Home-cooked Sri Lankan meals. Delivery to campus.",
+    amenities: ["Delivery", "Vegetarian", "Rice & Curry"],
+    location: "https://maps.google.com/?q=6.8150,80.0600",
+    isOwner: false
+  },
+];
+
+/* ============================================================
+   DATA — BUS ROUTES
+   Fields:
+     id          — unique string
+     routeNo     — bus route number string
+     name        — route name / description
+     from        — origin stop
+     to          — destination stop
+     via         — key stops (string)
+     frequency   — how often e.g. "Every 20 min"
+     firstBus    — first departure time string
+     lastBus     — last departure time string
+     schedule    — array of { time, direction, notes }
+                   direction: "to-nsbm" | "from-nsbm"
+     fare        — fare string e.g. "Rs.30–60"
+   ============================================================ */
+const busData = [
+  {
+    id: "bus1",
+    routeNo: "138",
+    name: "Colombo Fort — Avissawella",
+    from: "Colombo Fort", to: "Avissawella",
+    via: "Homagama, Pitipana, Hanwella",
+    frequency: "Every 15–20 min", firstBus: "05:00", lastBus: "21:00",
+    fare: "Rs.30–120",
+    schedule: [
+      { time: "05:15", direction: "to-nsbm",   notes: "First bus from Fort" },
+      { time: "06:00", direction: "to-nsbm",   notes: "" },
+      { time: "06:45", direction: "to-nsbm",   notes: "" },
+      { time: "07:15", direction: "to-nsbm",   notes: "Peak hour" },
+      { time: "07:45", direction: "to-nsbm",   notes: "Peak hour" },
+      { time: "08:00", direction: "from-nsbm", notes: "Towards Colombo" },
+      { time: "12:00", direction: "from-nsbm", notes: "Midday return" },
+      { time: "16:00", direction: "from-nsbm", notes: "Evening peak" },
+      { time: "17:00", direction: "from-nsbm", notes: "Evening peak" },
+      { time: "20:30", direction: "from-nsbm", notes: "Last bus to Fort" },
+    ]
+  },
+  {
+    id: "bus2",
+    routeNo: "122",
+    name: "Maharagama — Homagama",
+    from: "Maharagama", to: "Homagama Town",
+    via: "Kottawa, Polgasowita",
+    frequency: "Every 25 min", firstBus: "05:30", lastBus: "20:30",
+    fare: "Rs.25–60",
+    schedule: [
+      { time: "05:30", direction: "to-nsbm",   notes: "From Maharagama" },
+      { time: "06:30", direction: "to-nsbm",   notes: "" },
+      { time: "07:00", direction: "to-nsbm",   notes: "Peak hour" },
+      { time: "07:30", direction: "to-nsbm",   notes: "Peak hour" },
+      { time: "16:30", direction: "from-nsbm", notes: "Towards Maharagama" },
+      { time: "17:30", direction: "from-nsbm", notes: "Peak hour" },
+      { time: "19:45", direction: "from-nsbm", notes: "Last bus" },
+    ]
+  },
+  {
+    id: "bus3",
+    routeNo: "174",
+    name: "Nugegoda — Homagama",
+    from: "Nugegoda", to: "Homagama",
+    via: "Pannipitiya, Kottawa",
+    frequency: "Every 30 min", firstBus: "05:45", lastBus: "20:00",
+    fare: "Rs.40–80",
+    schedule: [
+      { time: "05:45", direction: "to-nsbm",   notes: "" },
+      { time: "07:00", direction: "to-nsbm",   notes: "Peak hour" },
+      { time: "08:00", direction: "to-nsbm",   notes: "Peak hour" },
+      { time: "17:00", direction: "from-nsbm", notes: "Evening peak" },
+      { time: "19:30", direction: "from-nsbm", notes: "Last bus" },
+    ]
+  },
+];
+
+/* ============================================================
+   DATA — TRAIN SCHEDULE
+   Nearest station: Homagama (Kelani Valley Line)
+   Fields:
+     id          — unique string
+     trainName   — name or number
+     from        — origin station
+     to          — destination station
+     via         — key stops
+     schedule    — array of { departure, arrival, direction, notes }
+     type        — "express" | "local"
+     fare        — fare string
+   ============================================================ */
+const trainData = [
+  {
+    id: "tr1",
+    trainName: "Kelani Valley Commuter",
+    from: "Homagama", to: "Colombo Fort",
+    via: "Padukka, Avissawella, Padukka, Homagama, Nugegoda, Maradana",
+    type: "local", fare: "Rs.20–50 (2nd class)",
+    schedule: [
+      { departure: "05:25", arrival: "06:55", direction: "to-colombo",  notes: "First train" },
+      { departure: "06:10", arrival: "07:40", direction: "to-colombo",  notes: "" },
+      { departure: "07:00", arrival: "08:30", direction: "to-colombo",  notes: "Peak hour" },
+      { departure: "08:00", arrival: "09:30", direction: "to-colombo",  notes: "Peak hour" },
+      { departure: "16:20", arrival: "17:50", direction: "from-colombo",notes: "Evening return" },
+      { departure: "17:15", arrival: "18:45", direction: "from-colombo",notes: "Peak return" },
+      { departure: "18:30", arrival: "20:00", direction: "from-colombo",notes: "" },
+      { departure: "20:00", arrival: "21:30", direction: "from-colombo",notes: "Last train" },
+    ]
+  },
+  {
+    id: "tr2",
+    trainName: "Avissawella Express",
+    from: "Homagama", to: "Colombo Fort",
+    via: "Nugegoda, Maradana",
+    type: "express", fare: "Rs.30–65 (2nd class)",
+    schedule: [
+      { departure: "06:40", arrival: "07:45", direction: "to-colombo",  notes: "Express — fewer stops" },
+      { departure: "07:50", arrival: "08:55", direction: "to-colombo",  notes: "Morning express" },
+      { departure: "17:00", arrival: "18:05", direction: "from-colombo",notes: "Evening express" },
+      { departure: "18:45", arrival: "19:50", direction: "from-colombo",notes: "" },
+    ]
+  },
+];
+
+/* ============================================================
+   DATA — VAN SERVICES
+   Fields:
+     id        — unique string
+     name      — service name
+     operator  — owner / operator name
+     route     — pickup area description
+     pickupTime— morning pickup time
+     returnTime— evening return time
+     capacity  — number of seats
+     price     — monthly fee string
+     phone     — contact phone
+     whatsapp  — whatsapp number or ""
+     note      — extra info
+     isOwner   — true if owner-registered
+   ============================================================ */
+const vanData = [
+  {
+    id: "v1",
+    name: "Homagama Morning Express",
+    operator: "Mr. Kamal Silva",
+    route: "Homagama Town → Pitipana → NSBM",
+    pickupTime: "07:15", returnTime: "17:30",
+    capacity: 12, price: "Rs.2,500/mo",
+    phone: "+94 71 111 2233", whatsapp: "+94711112233",
+    note: "Door-to-door pickup within Homagama area. Monthly subscription."
+  },
+  {
+    id: "v2",
+    name: "Colombo South Connect",
+    operator: "Mrs. Priya Fernando",
+    route: "Nugegoda → Maharagama → Kottawa → NSBM",
+    pickupTime: "06:45", returnTime: "17:00",
+    capacity: 10, price: "Rs.3,200/mo",
+    phone: "+94 77 223 4455", whatsapp: "+94772234455",
+    note: "AC van. Fixed seats — book early. 3 routes available."
+  },
+  {
+    id: "v3",
+    name: "Pannipitiya Shuttle",
+    operator: "Mr. Nimal Perera",
+    route: "Pannipitiya → Kottawa → Homagama → NSBM",
+    pickupTime: "07:00", returnTime: "17:15",
+    capacity: 8, price: "Rs.2,800/mo",
+    phone: "+94 70 334 5566", whatsapp: "",
+    note: "Smaller van. Flexible return times on request."
+  },
+];
+
+/* ============================================================
+   OWNER-REGISTERED LISTINGS (added via register form at runtime)
+   ============================================================ */
+let ownerListings = [];
+
+/* ============================================================
+   REGISTRATION STATE
+   ============================================================ */
+let regType    = "";
+let regPrice   = "";
+let regAmenities = [];
+let currentStep  = 1;
+
+const BOARDING_AMENITIES = [
+  "WiFi", "Meals included", "Hot water", "AC", "Security 24h",
+  "Laundry", "Furnished", "Parking", "TV", "Backup power",
+  "Garden", "Pet friendly", "Kitchen"
+];
+const FOOD_AMENITIES = [
+  "Dine-in", "Takeaway", "Delivery", "Beverages", "Rice & Curry",
+  "Short Eats", "Vegetarian", "Juices", "Card payment",
+  "WiFi", "Bulk orders", "Catering"
+];
+
+/* ============================================================
+   PAGE NAVIGATION
+   ============================================================ */
+function switchPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  btn.classList.add('active');
+  // re-render the relevant section
+  if (name === 'boarding') renderBoarding();
+  if (name === 'food')     renderFood();
+  if (name === 'bus')      renderBus();
+  if (name === 'train')    renderTrain();
+  if (name === 'van')      renderVan();
 }
 
-function switchTab(t,btn){curTab=t;document.querySelectorAll('.tb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');applyFilters();if(map&&service)searchNear()}
-function doSearch(){if(map&&service)searchNear();else applyFilters()}
+/* ============================================================
+   RENDER — BOARDING & ROOMS
+   ============================================================ */
+function renderBoarding() {
+  const q    = document.getElementById('boarding-search').value.toLowerCase();
+  const type = document.getElementById('boarding-type').value;
+  const price= document.getElementById('boarding-price').value;
+  const dist = parseFloat(document.getElementById('boarding-dist').value) || 99;
 
-function applyFilters(){
-  const pr=document.getElementById('priceF').value;
-  const di=parseFloat(document.getElementById('distF').value)||20;
-  const ra=parseFloat(document.getElementById('rateF').value)||0;
-  const q=document.getElementById('searchInput').value.toLowerCase();
-  let list=[...DEMO,...ownerR].filter(p=>{
-    if(curTab!=='all'&&p.type!==curTab)return false;
-    if(pr&&p.price!==pr)return false;
-    if(p.distance>di)return false;
-    if(p.rating<ra)return false;
-    if(q&&!p.name.toLowerCase().includes(q)&&!p.address.toLowerCase().includes(q))return false;
+  // combine static data + owner listings
+  const all  = [...boardingData, ...ownerListings.filter(l => l.type === 'boarding' || l.type === 'room')];
+
+  const list = all.filter(p => {
+    if (type  && p.type !== type)  return false;
+    if (price && p.price !== price) return false;
+    if (p.distance > dist)          return false;
+    if (q && !p.name.toLowerCase().includes(q) &&
+             !p.address.toLowerCase().includes(q)) return false;
     return true;
-  }).sort((a,b)=>a.distance-b.distance);
-  allR=list;renderCards(list);if(map)renderMarkers(list);
+  }).sort((a, b) => a.distance - b.distance);
+
+  document.getElementById('boarding-count').textContent = list.length + ' listing' + (list.length !== 1 ? 's' : '');
+  const grid = document.getElementById('boarding-grid');
+
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty-state"><p>No listings match your filters.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(p => buildListingCard(p)).join('');
+  bindIcons();
 }
 
-function renderCards(list){
-  const el=document.getElementById('rlist');
-  const sb=document.getElementById('statusbar');
-  const oc=list.filter(x=>x.isOwner).length;
-  if(!list.length){sb.innerHTML='No results found.';el.innerHTML='<div class="empty"><div class="ei">🔍</div>No places match your filters.</div>';return}
-  sb.innerHTML=`Showing <strong>${list.length}</strong> place${list.length>1?'s':''}${oc?' · '+oc+' owner-listed':''}`;
-  el.innerHTML=list.map(p=>{
-    const ico=p.type==='boarding'?'🏠':p.type==='room'?'🛏':'🍽';
-    const icl=p.type==='boarding'?'cb':p.type==='room'?'cr':'cf';
-    const bl=p.type==='boarding'?'bb':p.type==='room'?'br':'bf';
-    const bn=p.type==='boarding'?'Boarding':p.type==='room'?'Room':'Food';
-    const at=p.amenities&&p.amenities.length?`<div class="amenrow">${p.amenities.slice(0,4).map(a=>`<span class="atag">${a}</span>`).join('')}${p.amenities.length>4?`<span class="atag">+${p.amenities.length-4}</span>`:''}</div>`:'';
-    return `<div class="card${p.isOwner?' owner':''}" id="c${p.id}" onclick="selCard('${p.id}')">
-      <div class="crating">⭐ ${p.rating||'New'}</div>
-      <div class="chd">
-        <div class="cicon ${icl}">${ico}</div>
-        <div><div class="ctitle">${p.name}</div>
-        <span class="badge ${bl}">${bn}</span>${p.isOwner?'<span class="badge bo">Owner Listed</span>':''}
+/* ============================================================
+   RENDER — FOOD
+   ============================================================ */
+function renderFood() {
+  const q    = document.getElementById('food-search').value.toLowerCase();
+  const price= document.getElementById('food-price').value;
+  const dist = parseFloat(document.getElementById('food-dist').value) || 99;
+
+  const all  = [...foodData, ...ownerListings.filter(l => l.type === 'food')];
+
+  const list = all.filter(p => {
+    if (price && p.price !== price) return false;
+    if (p.distance > dist)          return false;
+    if (q && !p.name.toLowerCase().includes(q) &&
+             !p.address.toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a, b) => a.distance - b.distance);
+
+  document.getElementById('food-count').textContent = list.length + ' listing' + (list.length !== 1 ? 's' : '');
+  const grid = document.getElementById('food-grid');
+
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty-state"><p>No food places match your filters.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(p => buildListingCard(p)).join('');
+  bindIcons();
+}
+
+/* ============================================================
+   BUILD LISTING CARD HTML
+   Used by both boarding and food renders.
+   ============================================================ */
+function buildListingCard(p) {
+  const isBoarding = p.type === 'boarding';
+  const isRoom     = p.type === 'room';
+  const isFood     = p.type === 'food';
+
+  // icon filename mapping
+  // TO CHANGE ICON PER TYPE: edit these filenames
+  const typeIcon = isBoarding ? 'home' : isRoom ? 'bed' : 'food';
+
+  const badgeClass = isBoarding ? 'badge-boarding' : isRoom ? 'badge-room' : 'badge-food';
+  const badgeLabel = isBoarding ? 'Boarding' : isRoom ? 'Room' : 'Food';
+
+  const amenHTML = (p.amenities || []).slice(0, 4).map(a =>
+    `<span class="amenity-chip">${a}</span>`
+  ).join('') + (p.amenities && p.amenities.length > 4
+    ? `<span class="amenity-chip">+${p.amenities.length - 4} more</span>` : '');
+
+  const genderNote = (p.gender && p.gender !== 'any')
+    ? `<div class="meta-row">
+         <img class="icon icon-sm" src="${ICON_PATH}user.png" alt="" data-icon="user">
+         ${p.gender === 'male' ? 'Male students only' : 'Female students only'}
+       </div>` : '';
+
+  /*
+    LOCATION BUTTON:
+    If the owner has provided a location link, we show a "Location" button.
+    Clicking it opens the Google Maps link directly in the browser / Google Maps app.
+    No map is shown inside the app — it launches externally.
+  */
+  const locationBtn = p.location
+    ? `<button class="btn-action btn-location"
+         onclick="openLocation('${p.location}')"
+         title="Open in Google Maps">
+         <img class="icon icon-sm" src="${ICON_PATH}location.png" alt="Location" data-icon="location">
+         Location
+       </button>` : '';
+
+  const callBtn = p.phone
+    ? `<button class="btn-action"
+         onclick="window.location='tel:${p.phone}'"
+         title="Call ${p.phone}">
+         <img class="icon icon-sm" src="${ICON_PATH}phone.png" alt="Call" data-icon="phone">
+         Call
+       </button>` : '';
+
+  const waBtn = p.whatsapp
+    ? `<button class="btn-action"
+         onclick="openWhatsApp('${p.whatsapp}', '${escHtml(p.name)}')"
+         title="WhatsApp">
+         <img class="icon icon-sm" src="${ICON_PATH}whatsapp.png" alt="WhatsApp" data-icon="whatsapp">
+         WhatsApp
+       </button>` : '';
+
+  return `
+    <div class="listing-card${p.isOwner ? ' owner-card' : ''}">
+      <div class="rating-pill">
+        <img class="icon icon-sm" src="${ICON_PATH}star.png" alt="Rating" data-icon="star">
+        ${p.rating > 0 ? p.rating : 'New'}
+      </div>
+      <div class="card-top">
+        <div class="card-icon-wrap">
+          <!--
+            ICON: ${typeIcon}.png — card type icon
+            Change data-icon value to use a different icon file
+          -->
+          <img class="icon icon-md" src="${ICON_PATH}${typeIcon}.png" alt="${badgeLabel}" data-icon="${typeIcon}">
+        </div>
+        <div>
+          <div class="card-title">${escHtml(p.name)}</div>
+          <div class="card-badges">
+            <span class="badge ${badgeClass}">${badgeLabel}</span>
+            ${p.isOwner ? '<span class="badge badge-owner">Owner Listed</span>' : ''}
+          </div>
         </div>
       </div>
-      <div class="cmeta">
-        <span>📍 ${p.address}</span>
-        <span>🚗 ${p.distance} km</span>
-        ${p.phone?`<span>📞 ${p.phone}</span>`:''}
-        ${p.gender&&p.gender!=='any'?`<span>👤 ${p.gender==='male'?'Males':'Females'} only</span>`:''}
+      <div class="card-meta">
+        <div class="meta-row">
+          <img class="icon icon-sm" src="${ICON_PATH}location.png" alt="" data-icon="location">
+          ${escHtml(p.address)} &mdash; ${p.distance} km from NSBM
+        </div>
+        ${p.phone ? `<div class="meta-row">
+          <img class="icon icon-sm" src="${ICON_PATH}phone.png" alt="" data-icon="phone">
+          ${escHtml(p.phone)}
+        </div>` : ''}
+        ${genderNote}
+        ${p.note ? `<div class="meta-row" style="color:var(--text3);font-size:11px">${escHtml(p.note)}</div>` : ''}
       </div>
-      ${p.note?`<div class="cnote">${p.note}</div>`:''}
-      ${at}
-      <div class="cprice">${p.priceLabel}</div>
-      <div class="cactions">
-        <button class="bts p" onclick="event.stopPropagation();goDir(${p.lat},${p.lng})">Directions</button>
-        ${p.phone?`<button class="bts" onclick="event.stopPropagation();window.location='tel:${p.phone}'">Call</button>`:''}
-        ${p.whatsapp?`<button class="bts" onclick="event.stopPropagation();goWA('${p.whatsapp}','${p.name}')">WhatsApp</button>`:''}
-        <button class="bts" onclick="event.stopPropagation();goGM(${p.lat},${p.lng})">Map</button>
+      ${amenHTML ? `<div class="amenity-row">${amenHTML}</div>` : ''}
+      <div class="card-price">${escHtml(p.priceLabel)}</div>
+      <div class="card-actions">
+        ${locationBtn}
+        ${callBtn}
+        ${waBtn}
       </div>
     </div>`;
-  }).join('');
 }
 
-function selCard(id){
-  document.querySelectorAll('.card').forEach(c=>c.classList.remove('sel'));
-  const c=document.getElementById('c'+id);
-  if(c){c.classList.add('sel');c.scrollIntoView({behavior:'smooth',block:'nearest'})}
-  const p=allR.find(x=>String(x.id)===String(id));
-  if(p&&map){map.panTo({lat:p.lat,lng:p.lng});map.setZoom(15)}
-  const m=markers.find(x=>String(x._id)===String(id));
-  if(m) google.maps.event.trigger(m,'click');
+/*
+  openLocation — called when student taps the Location button on a card.
+  Opens the owner-provided Google Maps URL in a new tab.
+  On mobile this will launch the Google Maps app.
+*/
+function openLocation(url) {
+  if (url) window.open(url, '_blank');
 }
 
-function goDir(la,lo){window.open(`https://www.google.com/maps/dir/?api=1&origin=${NSBM.lat},${NSBM.lng}&destination=${la},${lo}`,'_blank')}
-function goGM(la,lo){window.open(`https://www.google.com/maps/search/?api=1&query=${la},${lo}`,'_blank')}
-function goWA(n,nm){window.open(`https://wa.me/${n.replace(/\D/g,'')}?text=Hi, I saw your listing on NSBM Student Finder (${nm}). I'm interested!`,'_blank')}
-
-function renderMarkers(list){
-  markers.forEach(m=>m.setMap(null));markers=[];
-  if(!map)return;
-  if(!iw)iw=new google.maps.InfoWindow();
-  list.forEach(p=>{
-    const col=p.type==='food'?'#e76f51':p.type==='room'?'#4338ca':'#2d6a4f';
-    const m=new google.maps.Marker({
-      position:{lat:p.lat,lng:p.lng},map,title:p.name,
-      icon:{path:google.maps.SymbolPath.CIRCLE,fillColor:col,fillOpacity:1,strokeColor:'#fff',strokeWeight:2,scale:p.isOwner?11:9}
-    });
-    m._id=p.id;
-    m.addListener('click',()=>{
-      iw.setContent(`<div style="font-family:'DM Sans',sans-serif;max-width:200px;padding:3px">
-        <div style="font-weight:600;font-size:13px;margin-bottom:4px">${p.name}</div>
-        <div style="font-size:11px;color:#777;margin-bottom:4px">📍 ${p.distance}km · ⭐${p.rating||'New'}</div>
-        <div style="font-size:12px;font-weight:600;color:${col};margin-bottom:8px">${p.priceLabel}</div>
-        <button onclick="goDir(${p.lat},${p.lng})" style="padding:5px 9px;background:${col};color:#fff;border:none;border-radius:5px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">Directions</button>
-        ${p.phone?`<button onclick="window.location='tel:${p.phone}'" style="margin-left:4px;padding:5px 9px;background:#f5f4f0;border:1px solid #ddd;border-radius:5px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">Call</button>`:''}
-      </div>`);
-      iw.open(map,m);
-      document.querySelectorAll('.card').forEach(c=>c.classList.remove('sel'));
-      const card=document.getElementById('c'+p.id);
-      if(card){card.classList.add('sel');card.scrollIntoView({behavior:'smooth',block:'nearest'})}
-    });
-    markers.push(m);
-  });
+function openWhatsApp(number, name) {
+  const cleaned = number.replace(/\D/g, '');
+  window.open(`https://wa.me/${cleaned}?text=Hi, I found your listing on NSBM Student Finder (${name}). I'm interested!`, '_blank');
 }
 
-function searchNear(){
-  if(!service)return;
-  const tm={all:[['lodging'],['restaurant'],['cafe']],boarding:[['lodging']],room:[['lodging']],food:[['restaurant'],['cafe']]};
-  const types=tm[curTab]||tm.all;
-  markers.forEach(m=>m.setMap(null));markers=[];
-  const base=[...ownerR];
-  document.getElementById('rlist').innerHTML='<div class="loading"><div class="spin"></div> Searching nearby places…</div>';
-  let pend=types.length;
-  types.forEach(t=>{
-    service.nearbySearch({location:NSBM,radius:20000,type:t[0]},(res,st)=>{
-      if(st===google.maps.places.PlacesServiceStatus.OK){
-        res.forEach(r=>{
-          const d=hav(NSBM.lat,NSBM.lng,r.geometry.location.lat(),r.geometry.location.lng());
-          base.push({id:r.place_id,name:r.name,type:t[0]==='lodging'?'boarding':'food',rating:r.rating||0,distance:Math.round(d*10)/10,price:r.price_level<=1?'low':r.price_level<=2?'mid':'high',priceLabel:['Free','Budget','Moderate','Pricey'][r.price_level||0]||'—',address:r.vicinity,lat:r.geometry.location.lat(),lng:r.geometry.location.lng(),phone:'',note:r.opening_hours?(r.opening_hours.open_now?'✅ Open now':'🔴 Closed now'):'',amenities:[]});
-        });
-      }
-      if(--pend===0){allR=base.filter((v,i,a)=>a.findIndex(x=>String(x.id)===String(v.id))===i);applyFilters();}
-    });
-  });
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function hav(a,b,c,d){const R=6371,f=x=>x*Math.PI/180,e=Math.sin(f(c-a)/2)**2+Math.cos(f(a))*Math.cos(f(c))*Math.sin(f(d-b)/2)**2;return R*2*Math.atan2(Math.sqrt(e),Math.sqrt(1-e))}
+/* ============================================================
+   RENDER — BUS ROUTES
+   ============================================================ */
+function renderBus() {
+  const q = document.getElementById('bus-search').value.toLowerCase();
+  const list = busData.filter(r =>
+    !q ||
+    r.routeNo.includes(q) ||
+    r.name.toLowerCase().includes(q) ||
+    r.from.toLowerCase().includes(q) ||
+    r.to.toLowerCase().includes(q) ||
+    r.via.toLowerCase().includes(q)
+  );
 
-function initMap(){
-  map=new google.maps.Map(document.getElementById('map'),{
-    center:NSBM,zoom:13,mapTypeControl:false,streetViewControl:false,
-    styles:[
-      {featureType:"poi",elementType:"labels",stylers:[{visibility:"off"}]},
-      {featureType:"water",stylers:[{color:"#c9dbe9"}]},
-      {featureType:"landscape",stylers:[{color:"#f0ede8"}]},
-      {featureType:"road",elementType:"geometry",stylers:[{color:"#fff"}]},
-      {featureType:"road",elementType:"labels.text.fill",stylers:[{color:"#888"}]},
-    ]
-  });
-  new google.maps.Marker({position:NSBM,map,title:'NSBM Green University',icon:{path:google.maps.SymbolPath.CIRCLE,fillColor:'#1b4332',fillOpacity:1,strokeColor:'#fff',strokeWeight:3,scale:13},label:{text:'🎓',fontSize:'13px'}});
-  new google.maps.Circle({strokeColor:'#2d6a4f',strokeOpacity:.2,strokeWeight:2,fillColor:'#2d6a4f',fillOpacity:.04,map,center:NSBM,radius:20000});
-  service=new google.maps.places.PlacesService(map);
-  iw=new google.maps.InfoWindow();
-  applyFilters();
-}
-
-
-
-// ── REGISTER ──
-function pickType(t,el){rType=t;document.querySelectorAll('.tc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');document.getElementById('typeErr').textContent=''}
-function pickPrice(p,el){rPrice=p;document.querySelectorAll('.popt').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');document.getElementById('priceErr').textContent=''}
-
-function buildFeatures(){
-  const isB=rType==='boarding'||rType==='room';
-  document.getElementById('fcBoarding').style.display=isB?'block':'none';
-  document.getElementById('fcFood').style.display=rType==='food'?'block':'none';
-  document.getElementById('grRooms').style.display=isB?'block':'none';
-  document.getElementById('grGender').style.display=isB?'block':'none';
-  document.getElementById('grHours').style.display=rType==='food'?'block':'none';
-  document.getElementById('grDays').style.display=rType==='food'?'block':'none';
-  document.getElementById('rentRow').style.display=isB?'block':'none';
-  document.getElementById('mealRow').style.display=rType==='food'?'block':'none';
-  document.getElementById('agBoarding').innerHTML=BA.map(a=>`<div class="achip" onclick="togA(this,'${a}')">${a}</div>`).join('');
-  document.getElementById('agFood').innerHTML=FA.map(a=>`<div class="achip" onclick="togA(this,'${a}')">${a}</div>`).join('');
-}
-
-function togA(el,a){el.classList.toggle('sel');if(el.classList.contains('sel'))rAmen.push(a);else rAmen=rAmen.filter(x=>x!==a)}
-
-function setStep(s){
-  for(let i=1;i<=5;i++){
-    const d=document.getElementById('rs'+i);if(d)d.style.display=i===s?'block':'none';
-    const si=document.getElementById('si'+i);
-    if(si){si.classList.remove('active','done');if(i<s)si.classList.add('done');else if(i===s)si.classList.add('active')}
-  }curStep=s;
-}
-
-function nextS(from){
-  if(from===1){if(!rType){document.getElementById('typeErr').textContent='Please select a type.';return}buildFeatures();setStep(2);return}
-  if(from===2){
-    const n=document.getElementById('fn').value.trim();
-    const a=document.getElementById('fa').value.trim();
-    const d=parseFloat(document.getElementById('fd').value);
-    let ok=true;
-    [['fn',!n],['fa',!a],['fd',!d||d>20||d<0]].forEach(([id,bad])=>{document.getElementById(id).classList.toggle('err',bad);if(bad)ok=false});
-    if(!rPrice){document.getElementById('priceErr').textContent='Please select a price range.';ok=false}
-    if(!ok)return;setStep(3);return;
+  const grid = document.getElementById('bus-grid');
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty-state"><p>No bus routes found.</p></div>`;
+    return;
   }
-  if(from===3){setStep(4);return}
-}
-function prevS(from){setStep(from-1)}
 
-function handlePics(e){
-  const prev=document.getElementById('prevs');
-  Array.from(e.target.files).forEach(f=>{
-    const r=new FileReader();r.onload=ev=>{const img=document.createElement('img');img.className='prev';img.src=ev.target.result;prev.appendChild(img)};r.readAsDataURL(f);
+  grid.innerHTML = list.map(r => `
+    <div class="transport-card">
+      <div class="transport-card-hd">
+        <div class="transport-icon-wrap">
+          <!--
+            ICON: bus.png — bus route card icon
+          -->
+          <img class="icon icon-md" src="${ICON_PATH}bus.png" alt="Bus" data-icon="bus">
+        </div>
+        <div>
+          <div class="transport-title">Route ${escHtml(r.routeNo)} &mdash; ${escHtml(r.name)}</div>
+          <div class="transport-sub">${escHtml(r.from)} &rarr; ${escHtml(r.to)}</div>
+        </div>
+        <span class="transport-badge badge-boarding">${escHtml(r.fare)}</span>
+      </div>
+      <table class="timetable">
+        <thead>
+          <tr>
+            <th>Departure</th>
+            <th>Direction</th>
+            <th>Frequency</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${r.schedule.map(s => `
+            <tr>
+              <td><span class="time-chip">${escHtml(s.time)}</span></td>
+              <td>${s.direction === 'to-nsbm' ? 'To NSBM' : 'From NSBM'}</td>
+              <td><span class="freq-chip">${escHtml(r.frequency)}</span></td>
+              <td style="color:var(--text3)">${escHtml(s.notes)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+      <div style="padding:10px 18px;font-size:11px;color:var(--text3);border-top:1px solid var(--border)">
+        Via: ${escHtml(r.via)} &nbsp;&middot;&nbsp; First bus: ${r.firstBus} &nbsp;&middot;&nbsp; Last bus: ${r.lastBus}
+      </div>
+    </div>`
+  ).join('');
+  bindIcons();
+}
+
+/* ============================================================
+   RENDER — TRAIN
+   ============================================================ */
+function renderTrain() {
+  const q = document.getElementById('train-search').value.toLowerCase();
+  const list = trainData.filter(r =>
+    !q ||
+    r.trainName.toLowerCase().includes(q) ||
+    r.from.toLowerCase().includes(q) ||
+    r.to.toLowerCase().includes(q) ||
+    r.via.toLowerCase().includes(q)
+  );
+
+  const grid = document.getElementById('train-grid');
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty-state"><p>No trains found.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(r => `
+    <div class="transport-card">
+      <div class="transport-card-hd">
+        <div class="transport-icon-wrap">
+          <!--
+            ICON: train.png — train schedule card icon
+          -->
+          <img class="icon icon-md" src="${ICON_PATH}train.png" alt="Train" data-icon="train">
+        </div>
+        <div>
+          <div class="transport-title">${escHtml(r.trainName)}</div>
+          <div class="transport-sub">${escHtml(r.from)} &rarr; ${escHtml(r.to)} &nbsp;&middot;&nbsp; ${r.type === 'express' ? 'Express' : 'Local'}</div>
+        </div>
+        <span class="transport-badge badge-room">${escHtml(r.fare)}</span>
+      </div>
+      <table class="timetable">
+        <thead>
+          <tr>
+            <th>Departure</th>
+            <th>Arrival</th>
+            <th>Direction</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${r.schedule.map(s => `
+            <tr>
+              <td><span class="time-chip train">${escHtml(s.departure)}</span></td>
+              <td><span class="time-chip train">${escHtml(s.arrival)}</span></td>
+              <td>${s.direction === 'to-colombo' ? 'To Colombo' : 'From Colombo'}</td>
+              <td style="color:var(--text3)">${escHtml(s.notes)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+      <div style="padding:10px 18px;font-size:11px;color:var(--text3);border-top:1px solid var(--border)">
+        Via: ${escHtml(r.via)}
+      </div>
+    </div>`
+  ).join('');
+  bindIcons();
+}
+
+/* ============================================================
+   RENDER — VAN SERVICES
+   ============================================================ */
+function renderVan() {
+  const q = document.getElementById('van-search').value.toLowerCase();
+  const list = vanData.filter(v =>
+    !q ||
+    v.name.toLowerCase().includes(q) ||
+    v.route.toLowerCase().includes(q) ||
+    v.operator.toLowerCase().includes(q)
+  );
+
+  document.getElementById('van-count').textContent = list.length + ' service' + (list.length !== 1 ? 's' : '');
+  const grid = document.getElementById('van-grid');
+
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty-state"><p>No van services found.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(v => `
+    <div class="van-card">
+      <div class="card-top">
+        <div class="transport-icon-wrap">
+          <!--
+            ICON: van.png — private van service icon
+          -->
+          <img class="icon icon-md" src="${ICON_PATH}van.png" alt="Van" data-icon="van">
+        </div>
+        <div>
+          <div class="card-title">${escHtml(v.name)}</div>
+          <div class="card-badges">
+            <span class="badge" style="background:var(--tag-van-l);color:var(--tag-van)">Van Service</span>
+            <span class="badge" style="background:var(--surface2);color:var(--text3)">${v.capacity} seats</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-row">
+          <!--
+            ICON: arrow-right.png — route direction indicator
+          -->
+          <img class="icon icon-sm" src="${ICON_PATH}arrow-right.png" alt="" data-icon="arrow-right">
+          ${escHtml(v.route)}
+        </div>
+        <div class="meta-row">
+          <!--
+            ICON: clock.png — pickup/return times
+          -->
+          <img class="icon icon-sm" src="${ICON_PATH}clock.png" alt="" data-icon="clock">
+          Pickup ${escHtml(v.pickupTime)} &nbsp;&middot;&nbsp; Return ${escHtml(v.returnTime)}
+        </div>
+        <div class="meta-row">
+          <!--
+            ICON: user.png — operator name
+          -->
+          <img class="icon icon-sm" src="${ICON_PATH}user.png" alt="" data-icon="user">
+          ${escHtml(v.operator)}
+        </div>
+        ${v.note ? `<div class="meta-row" style="color:var(--text3);font-size:11px">${escHtml(v.note)}</div>` : ''}
+      </div>
+      <div class="card-price">${escHtml(v.price)}</div>
+      <div class="card-actions">
+        <button class="btn-action primary" onclick="window.location='tel:${escHtml(v.phone)}'">
+          <img class="icon icon-sm" src="${ICON_PATH}phone.png" alt="Call" data-icon="phone">
+          Call
+        </button>
+        ${v.whatsapp ? `
+        <button class="btn-action" onclick="openWhatsApp('${escHtml(v.whatsapp)}', '${escHtml(v.name)}')">
+          <img class="icon icon-sm" src="${ICON_PATH}whatsapp.png" alt="WhatsApp" data-icon="whatsapp">
+          WhatsApp
+        </button>` : ''}
+      </div>
+    </div>`
+  ).join('');
+  bindIcons();
+}
+
+/* ============================================================
+   BIND ICONS — re-applies ICON_PATH to any newly rendered icons
+   Call this after any innerHTML update that includes icon images.
+   ============================================================ */
+function bindIcons() {
+  document.querySelectorAll('img[data-icon]').forEach(img => {
+    img.src = ICON_PATH + img.getAttribute('data-icon') + '.png';
   });
 }
 
-function submit(){
-  const own=document.getElementById('fowner').value.trim();
-  const ph=document.getElementById('fphone').value.trim();
-  if(!own){document.getElementById('fowner').classList.add('err');return}document.getElementById('fowner').classList.remove('err');
-  if(!ph){document.getElementById('fphone').classList.add('err');return}document.getElementById('fphone').classList.remove('err');
+/* ============================================================
+   MODAL — open / close
+   ============================================================ */
+function openModal() {
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setStep(1);
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function backdropClick(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+}
 
-  const nm=document.getElementById('fn').value.trim();
-  const ad=document.getElementById('fa').value.trim();
-  const di=parseFloat(document.getElementById('fd').value);
-  const desc=document.getElementById('fdesc').value.trim();
-  const rent=document.getElementById('frent').value;
-  const meal=document.getElementById('fmeal').value;
-  const wa=document.getElementById('fwa').value.trim();
-  const em=document.getElementById('femail').value.trim();
-  const gen=document.getElementById('fgender').value;
+/* ============================================================
+   MODAL — step management
+   ============================================================ */
+function setStep(n) {
+  currentStep = n;
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById('modal-step-' + i);
+    if (el) el.style.display = (i === n) ? 'block' : 'none';
+    const bar = document.getElementById('ms' + i);
+    if (bar) {
+      bar.classList.remove('active', 'done');
+      if (i < n)      bar.classList.add('done');
+      else if (i === n) bar.classList.add('active');
+    }
+  }
+  bindIcons();
+}
 
-  const pl=rType==='food'?(meal?`~Rs.${meal}/meal`:'—'):(rent?`Rs.${rent}/mo`:'—');
+/* ============================================================
+   MODAL — form selections
+   ============================================================ */
+function selectType(type, el) {
+  regType = type;
+  document.querySelectorAll('.type-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('type-err').textContent = '';
+}
 
-  const listing={
-    id:'own-'+Date.now(),name:nm,type:rType,rating:0,distance:di,price:rPrice,
-    priceLabel:pl,address:ad,
-    lat:NSBM.lat+(Math.random()-.5)*.12,
-    lng:NSBM.lng+(Math.random()-.5)*.12,
-    phone:ph,whatsapp:wa,email:em,gender:gen,
-    note:desc||'Newly listed place near NSBM.',
-    amenities:[...rAmen],isOwner:true,
+function selectPrice(price, el) {
+  regPrice = price;
+  document.querySelectorAll('.price-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('price-err').textContent = '';
+}
+
+function buildAmenitySelector() {
+  const list  = (regType === 'food') ? FOOD_AMENITIES : BOARDING_AMENITIES;
+  regAmenities = [];
+  document.getElementById('amenity-selector').innerHTML = list.map(a =>
+    `<div class="amenity-opt" onclick="toggleAmenity(this,'${a}')">${a}</div>`
+  ).join('');
+}
+
+function toggleAmenity(el, a) {
+  el.classList.toggle('selected');
+  if (el.classList.contains('selected')) regAmenities.push(a);
+  else regAmenities = regAmenities.filter(x => x !== a);
+}
+
+/* ============================================================
+   MODAL — next / previous step
+   ============================================================ */
+function nextStep(from) {
+  if (from === 1) {
+    if (!regType) {
+      document.getElementById('type-err').textContent = 'Please select a type to continue.';
+      return;
+    }
+    // show/hide fields based on type
+    const isBoarding = regType === 'boarding' || regType === 'room';
+    document.getElementById('f-rent-row').style.display   = isBoarding ? 'block' : 'none';
+    document.getElementById('f-meal-row').style.display   = regType === 'food' ? 'block' : 'none';
+    document.getElementById('f-gender-row').style.display = isBoarding ? 'block' : 'none';
+    setStep(2);
+    return;
+  }
+  if (from === 2) {
+    const name = document.getElementById('f-name').value.trim();
+    const addr = document.getElementById('f-address').value.trim();
+    const dist = parseFloat(document.getElementById('f-dist').value);
+    let ok = true;
+    const nameEl = document.getElementById('f-name');
+    const addrEl = document.getElementById('f-address');
+    const distEl = document.getElementById('f-dist');
+    nameEl.classList.toggle('input-error', !name);
+    addrEl.classList.toggle('input-error', !addr);
+    distEl.classList.toggle('input-error', !dist || dist > 20);
+    if (!name || !addr || !dist || dist > 20) ok = false;
+    if (!regPrice) { document.getElementById('price-err').textContent = 'Please select a price range.'; ok = false; }
+    if (!ok) return;
+    buildAmenitySelector();
+    setStep(3);
+    return;
+  }
+  if (from === 3) { setStep(4); return; }
+}
+
+function prevStep(from) {
+  setStep(from - 1);
+}
+
+/* ============================================================
+   MODAL — photo upload handler
+   ============================================================ */
+function handlePhotos(e) {
+  const container = document.getElementById('photo-previews');
+  Array.from(e.target.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = document.createElement('img');
+      img.className = 'photo-preview';
+      img.src = ev.target.result;
+      container.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ============================================================
+   MODAL — submit listing
+   ============================================================ */
+function submitListing() {
+  const owner = document.getElementById('f-owner').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  document.getElementById('f-owner').classList.toggle('input-error', !owner);
+  document.getElementById('f-phone').classList.toggle('input-error', !phone);
+  if (!owner || !phone) return;
+
+  const name     = document.getElementById('f-name').value.trim();
+  const address  = document.getElementById('f-address').value.trim();
+  const dist     = parseFloat(document.getElementById('f-dist').value);
+  const desc     = document.getElementById('f-desc').value.trim();
+  const rent     = document.getElementById('f-rent').value;
+  const meal     = document.getElementById('f-meal').value;
+  const whatsapp = document.getElementById('f-whatsapp').value.trim();
+  const email    = document.getElementById('f-email').value.trim();
+  const gender   = (document.getElementById('f-gender').offsetParent !== null)
+                   ? document.getElementById('f-gender').value : 'any';
+  const location = document.getElementById('f-location').value.trim();
+
+  const priceLabel = regType === 'food'
+    ? (meal ? `~Rs.${meal}/meal` : 'See owner')
+    : (rent ? `Rs.${rent}/mo`    : 'See owner');
+
+  const newListing = {
+    id:          'own-' + Date.now(),
+    type:         regType,
+    name, address,
+    distance:     dist,
+    price:        regPrice,
+    priceLabel,
+    rating:       0,
+    phone,
+    whatsapp,
+    email,
+    gender,
+    note:         desc || '',
+    amenities:    [...regAmenities],
+    /*
+      LOCATION: saved directly from owner's input.
+      When student taps "Location" button, openLocation(url) is called
+      which opens this URL in Google Maps.
+    */
+    location:     location || '',
+    isOwner:      true,
   };
-  ownerR.push(listing);
 
-  document.getElementById('lprev').innerHTML=`
-    <div class="ln">${nm} <span class="newbadge">✨ New</span></div>
-    <div class="lm">
-      <span>${rType==='boarding'?'🏠 Boarding':rType==='room'?'🛏 Room':'🍽 Food'}</span>
-      <span>📍 ${di} km from NSBM</span>
-      <span>💰 ${pl}</span>
-      <span>📞 ${ph}</span>
-      ${wa?`<span>💬 WhatsApp</span>`:''}
+  ownerListings.push(newListing);
+
+  // show summary
+  document.getElementById('listing-summary').innerHTML = `
+    <div class="ls-name">${escHtml(name)}</div>
+    <div class="ls-meta">
+      <span>${regType === 'boarding' ? 'Boarding' : regType === 'room' ? 'Room' : 'Food'}</span>
+      <span>${dist} km from NSBM</span>
+      <span>${priceLabel}</span>
+      <span>${phone}</span>
     </div>`;
+
   setStep(5);
+
+  // re-render active section to include new listing
+  const active = document.querySelector('.nav-tab.active');
+  const activePage = active ? active.getAttribute('onclick').match(/'(\w+)'/)?.[1] : null;
+  if (activePage === 'boarding' || regType === 'boarding' || regType === 'room') renderBoarding();
+  if (activePage === 'food'     || regType === 'food') renderFood();
 }
 
-function viewOnMap(){
-  showPage('search');applyFilters();
-  setTimeout(()=>{
-    const l=ownerR[ownerR.length-1];
-    if(l){const c=document.getElementById('c'+l.id);if(c){c.classList.add('sel');c.scrollIntoView({behavior:'smooth',block:'nearest'})}}
-  },250);
-}
-
-function addAnother(){
-  rType='';rPrice='';rAmen=[];
-  document.querySelectorAll('.tc,.popt,.achip').forEach(c=>c.classList.remove('sel'));
-  document.querySelectorAll('input:not([type=file]),textarea').forEach(i=>{i.value='';i.classList.remove('err')});
-  document.getElementById('prevs').innerHTML='';
+/* ============================================================
+   MODAL — add another / reset form
+   ============================================================ */
+function addAnother() {
+  regType = ''; regPrice = ''; regAmenities = [];
+  document.querySelectorAll('.type-opt, .price-opt, .amenity-opt')
+    .forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('#modal input:not([type=file]), #modal textarea, #modal select')
+    .forEach(el => { if(el.tagName==='SELECT') el.selectedIndex=0; else el.value=''; el.classList.remove('input-error'); });
+  document.getElementById('photo-previews').innerHTML = '';
   setStep(1);
 }
 
-window.onload=()=>{
-  applyFilters();
-  const s=document.createElement('script');
-  s.src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBQUW8VJQTA9_uEqGUuFQ2byxvRTXg8QgI&libraries=places&callback=initMap';
-  s.async=true;
-  s.onerror=()=>{document.getElementById('map').innerHTML=`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;color:#777;font-family:'DM Sans',sans-serif;background:#e8e4dc"><div style="font-size:34px">⚠️</div><div style="font-size:13px;text-align:center">Map failed to load.<br><span style="font-size:10px">Check API key restrictions.</span></div></div>`};
-  document.head.appendChild(s);
-};
+/* ============================================================
+   INITIAL RENDER on page load
+   ============================================================ */
+window.addEventListener('DOMContentLoaded', () => {
+  renderBoarding();
+});
 </script>
 </body>
 </html>
