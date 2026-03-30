@@ -87,14 +87,7 @@ select:focus{border-color:var(--accent)}
 .spin{width:15px;height:15px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 .loading{display:flex;align-items:center;gap:8px;padding:20px;font-size:13px;color:var(--muted)}
-.api-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 26px;text-align:center;max-width:310px;box-shadow:var(--shadow-md);z-index:10}
-.api-box h3{font-size:14px;margin-bottom:6px}
-.api-box p{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:13px}
-.api-row{display:flex;gap:6px}
-.api-row input{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;outline:none}
-.api-row input:focus{border-color:var(--accent)}
-.api-row button{padding:7px 12px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer}
-.api-skip{margin-top:8px;font-size:11px;color:var(--muted);text-decoration:underline;cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif}
+
 
 /* ── REGISTER PAGE ── */
 .regpage{flex:1;overflow-y:auto;background:var(--bg);padding:28px 16px;flex-direction:column}
@@ -216,15 +209,7 @@ select:focus{border-color:var(--accent)}
   <div class="mapc">
     <div id="map"></div>
     <div class="movl"><strong>NSBM Green University</strong> — Pitipana, Homagama</div>
-    <div class="api-box" id="apiBox">
-      <h3>🗺 Google Maps API Key</h3>
-      <p>Enter your key (Maps JavaScript API + Places API enabled) to activate live map and nearby search.</p>
-      <div class="api-row">
-        <input type="text" id="apiKey" placeholder="AIza…"/>
-        <button onclick="loadMap()">Load</button>
-      </div>
-      <button class="api-skip" onclick="skipMap()">Continue in demo mode</button>
-    </div>
+
   </div>
 </div>
 
@@ -523,7 +508,6 @@ function searchNear(){
 function hav(a,b,c,d){const R=6371,f=x=>x*Math.PI/180,e=Math.sin(f(c-a)/2)**2+Math.cos(f(a))*Math.cos(f(c))*Math.sin(f(d-b)/2)**2;return R*2*Math.atan2(Math.sqrt(e),Math.sqrt(1-e))}
 
 function initMap(){
-  document.getElementById('apiBox').style.display='none';
   map=new google.maps.Map(document.getElementById('map'),{
     center:NSBM,zoom:13,mapTypeControl:false,streetViewControl:false,
     styles:[
@@ -541,19 +525,7 @@ function initMap(){
   applyFilters();
 }
 
-function loadMap(){
-  const k=document.getElementById('apiKey').value.trim();
-  if(!k){alert('Please enter an API key.');return}
-  const s=document.createElement('script');
-  s.src=`https://maps.googleapis.com/maps/api/js?key=${k}&libraries=places&callback=initMap`;
-  s.async=true;s.onerror=()=>alert('Failed to load Google Maps. Check your API key.');
-  document.head.appendChild(s);
-}
-function skipMap(){
-  document.getElementById('apiBox').style.display='none';
-  document.getElementById('map').innerHTML=`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;color:#777;font-family:'DM Sans',sans-serif;background:#e8e4dc"><div style="font-size:34px">🗺</div><div style="font-size:13px;text-align:center">Demo mode — no map<br><span style="font-size:10px">Add a Google Maps API key to enable</span></div></div>`;
-  applyFilters();
-}
+
 
 // ── REGISTER ──
 function pickType(t,el){rType=t;document.querySelectorAll('.tc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');document.getElementById('typeErr').textContent=''}
@@ -662,7 +634,14 @@ function addAnother(){
   setStep(1);
 }
 
-window.onload=()=>applyFilters();
+window.onload=()=>{
+  applyFilters();
+  const s=document.createElement('script');
+  s.src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBQUW8VJQTA9_uEqGUuFQ2byxvRTXg8QgI&libraries=places&callback=initMap';
+  s.async=true;
+  s.onerror=()=>{document.getElementById('map').innerHTML=`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;color:#777;font-family:'DM Sans',sans-serif;background:#e8e4dc"><div style="font-size:34px">⚠️</div><div style="font-size:13px;text-align:center">Map failed to load.<br><span style="font-size:10px">Check API key restrictions.</span></div></div>`};
+  document.head.appendChild(s);
+};
 </script>
 </body>
 </html>
